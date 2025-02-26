@@ -6,9 +6,10 @@ import { WebhookModule } from './modules/webhook/webhook.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { PostgresModule } from './modules/postgres/postgres.module';
 import { UserModule } from './modules/user/user.module';
+import { CommonModule } from './modules/common/common.module';
 
 @Module({
-    imports: [BotModule, WebhookModule, AuthModule, PostgresModule, UserModule],
+    imports: [BotModule, WebhookModule, AuthModule, PostgresModule, UserModule, CommonModule],
     controllers: [AppController],
     providers: [AppService],
 })
