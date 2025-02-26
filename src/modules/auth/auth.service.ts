@@ -53,6 +53,7 @@ export class AuthService {
       req.user = user;
 
       return user;
+
     } catch (error) {
       throw new UnauthorizedException('Invalid or expired token');
     }

@@ -32,8 +32,14 @@ export class User {
     @Column({ unique: true, nullable: true })
     email: string; // Уникальный email
 
+    @Column({ default: false })
+    email_is_confirm: boolean;
+
     @Column({ nullable: true })
     phone: string;
+
+    @Column({ default: false })
+    phone_is_confirm: boolean;
 
     @Column({ default: false })
     is_auth: boolean;

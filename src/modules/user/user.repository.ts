@@ -13,10 +13,14 @@ export class UserRepository {
 
     async createUser(userCreateDto: UserCreateDto): Promise<User> {
         const user = this.userRepository.create(userCreateDto);
-        return await this.userRepository.save(user);
+        return await this.save(user);
     }
 
     async findUserById(id: number): Promise<User | null> {
         return await this.userRepository.findOne({ where: { id } });
+    }
+
+    async save(user: UserCreateDto) {
+        return await this.userRepository.save(user);
     }
 }
