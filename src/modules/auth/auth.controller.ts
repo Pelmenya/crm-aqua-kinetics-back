@@ -3,14 +3,14 @@ import { Request } from 'express';
 import { AuthService } from './auth.service';
 import { AuthGuard } from './auth.guard';
 
+@UseGuards(AuthGuard)
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+    constructor(private readonly authService: AuthService) { }
+    @Post()
+    async authorize(@Req() req: Request) {
 
-  @Post()
-  async authorize(@Req() req: Request) {
-		
-    const initData = await this.authService.validateInitData(req);
-    return initData;
-  }
+        const initData = await this.authService.validateInitData(req);
+        return initData;
+    }
 }
