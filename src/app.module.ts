@@ -4,9 +4,10 @@ import { AppService } from './app.service';
 import { BotModule } from './modules/bot/bot.module';
 import { WebhookModule } from './modules/webhook/webhook.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { PostgresModule } from './modules/postgres/postgres.module';
 
 @Module({
-    imports: [BotModule, WebhookModule, AuthModule],
+    imports: [BotModule, WebhookModule, AuthModule, PostgresModule],
     controllers: [AppController],
     providers: [AppService],
 })
