@@ -1,19 +1,27 @@
-# Миграции
+# Инфо и комманды
 
-## Новая миграция
+## Адрес для pgAdmin
+
+```clip
+host.docker.internal
+```
+
+## Миграции
+
+### Новая миграция
 
 ```bash
 
 docker exec crm-aqua-kinetics-back-dev npm run migration:create --name=TestMigration
 ```
 
-## Запустить миграцию
+### Запустить миграцию
 
 ```bash
 docker exec crm-aqua-kinetics-back-dev npm run migration:run
 ```
 
-## Откатить миграцию
+### Откатить миграцию
 
 ```bash
 docker exec crm-aqua-kinetics-back-dev npm run migration:revert
