@@ -25,6 +25,7 @@ export class BotService {
                 [Markup.button.callback('Отправить изображение', 'send_photo')],
                 [Markup.button.callback('Отправить аудио', 'send_audio')],
                 [Markup.button.callback('Отправить голосовое сообщение', 'send_voice')],
+                [Markup.button.url('Запустить Mini App', 'https://t.me/AquaphorBot_bot/crm_app')],
             ]),
         );
     }
@@ -57,7 +58,7 @@ export class BotService {
 
     @Action('send_photo')
     async onSendPhoto(@Ctx() ctx: Context) {
-        const photoUrl = 'https://s3.timeweb.cloud/0fd3fca7-top-hotels/i.jpeg';
+        const photoUrl = 'https://api.на-день.рф/api/uploads/images/2.png';
         await ctx.telegram.sendPhoto(ctx.chat.id, photoUrl, {
             caption: 'My Father!',
         });

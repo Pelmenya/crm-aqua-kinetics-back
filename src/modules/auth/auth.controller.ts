@@ -8,8 +8,8 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post()
-  @UseGuards(AuthGuard)
   async authorize(@Req() req: Request) {
+		
     const initData = await this.authService.validateInitData(req);
     return initData;
   }

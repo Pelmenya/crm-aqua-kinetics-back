@@ -14,12 +14,11 @@ export class AuthService {
   async validateInitData(req: Request) {
     const authHeader = req.headers['authorization'] || '';
     const [authType, authData] = authHeader.split(' ');
-
     if (authType !== 'tma') {
       throw new UnauthorizedException('User not authorized');
     }
-
-    validate(authData, this.botToken, { expiresIn: 3600 });
+//   validate(authData, this.botToken, { expiresIn: 3600 });
+    validate(authData, this.botToken);
     return parse(authData);
   }
 }
