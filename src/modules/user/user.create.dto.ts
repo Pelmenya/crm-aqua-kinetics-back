@@ -1,4 +1,5 @@
 import { IsBoolean, IsEmail, IsNumber, IsOptional, IsString, IsUrl } from 'class-validator';
+import { UserRole } from './user.entity';
 
 export class UserCreateDto {
     @IsBoolean()
@@ -29,4 +30,7 @@ export class UserCreateDto {
     @IsOptional()
     @IsString()
     phone?: string;
+
+    @IsString()
+    role: UserRole;
 }

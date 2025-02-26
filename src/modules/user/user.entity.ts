@@ -1,5 +1,11 @@
 import { Entity, Column, PrimaryColumn } from 'typeorm';
 
+export enum UserRole {
+    ADMIN = 'admin',
+    MANAGER = 'manager',
+    CLIENT = 'client',
+    SERVICE = 'service',
+}
 @Entity()
 export class User {
     @PrimaryColumn()
@@ -23,9 +29,19 @@ export class User {
     @Column({ unique: true })
     username: string; // Уникальный username
 
-    @Column({ unique: true })
+    @Column({ unique: true, nullable: true })
     email: string; // Уникальный email
 
     @Column({ nullable: true })
     phone: string;
+
+    @Column({ default: false })
+    is_auth: boolean;
+
+    @Column({
+        type: 'enum',
+        enum: UserRole,
+        default: UserRole.CLIENT,
+    })
+    role: UserRole;
 }

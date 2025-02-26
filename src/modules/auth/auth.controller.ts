@@ -1,14 +1,15 @@
-import { Controller, Post, UseGuards, Req } from '@nestjs/common';
+import { Controller, Post, Req } from '@nestjs/common';
 import { Request } from 'express';
 import { AuthService } from './auth.service';
 import { AuthGuard } from './auth.guard';
+import { User } from '../user/user.entity';
 
-@UseGuards(AuthGuard)
+
 @Controller('auth')
 export class AuthController {
     constructor(private readonly authService: AuthService) { }
     @Post()
-    async authorize(@Req() req: Request) {
+    async authorize(@Req() req: Request & User) {
 
         const initData = await this.authService.validateInitData(req);
         return initData;

@@ -6,6 +6,12 @@
 host.docker.internal
 ```
 
+## Старт приложения в Docker
+
+```clip
+docker compose -f docker-compose.dev.yml up --build
+```
+
 ## Миграции
 
 ### Новая миграция
