@@ -26,7 +26,6 @@ export class AuthController {
     async register(@Req() req: Request & User, @Body() body: Partial<UserCreateDto>) {
         const user = req.user;
 
-        console.log(user)
         if (!user) {
             throw new UnauthorizedException('User not authorized');
         }
@@ -47,6 +46,6 @@ export class AuthController {
         // Сохраняем обновленного пользователя в базе данных
         await this.userRepository.save(user);
 
-        return user;
+        return await this.userRepository.findUserById(user.id);
     }
 }
