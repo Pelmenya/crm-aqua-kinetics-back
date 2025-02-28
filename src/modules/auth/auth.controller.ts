@@ -38,7 +38,7 @@ export class AuthController {
             user.phone = body.phone;
         }
 
-        // Устанавливаем is__auth в true, если оба поля заполнены
+        // Устанавливаем is_auth в true, если оба поля заполнены
         if (user.email && user.phone) {
             user.is_auth = true;
         }
