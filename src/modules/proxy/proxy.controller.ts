@@ -1,10 +1,8 @@
 import { Controller, Get, Query, UseGuards } from '@nestjs/common';
 import { ProxyService } from './proxy.service';
 import { TCoordinatesResData, TSuggestionAddressResData } from './proxy.types';
-import { AuthGuard } from '../auth/auth.guard';
 import { SearchBaseParams } from 'src/types/search-base-params';
 
-@UseGuards(AuthGuard)
 @Controller('proxy')
 export class ProxyController {
     constructor(private readonly proxyService: ProxyService) { }

@@ -4,7 +4,7 @@ import { IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class SearchBaseParams {
     @ApiProperty({
-        example: 'A good weather or Moscow',
+        example: 'A good weather on Moscow',
         required: false,
         description: 'Any query string',
     })

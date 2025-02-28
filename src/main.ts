@@ -2,6 +2,7 @@ import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { RolesGuard } from './modules/user/user.role.guard';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
@@ -24,6 +25,15 @@ async function bootstrap() {
 
     const reflector = app.get(Reflector);
     app.useGlobalGuards(new RolesGuard(reflector));
+        // Настройка Swagger
+        const config = new DocumentBuilder()
+        .setTitle('Hotel Aggregator API')
+        .setDescription('API documentation for Hotel Aggregator')
+        .setVersion('1.0')
+        .build();
+    const document = SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup('api/docs', app, document);
+
 
     await app.listen(process.env.PORT ?? 3000);
 }
