@@ -8,6 +8,7 @@ import { PostgresModule } from './modules/postgres/postgres.module';
 import { UserModule } from './modules/user/user.module';
 import { CommonModule } from './modules/common/common.module';
 import { ProxyModule } from './modules/proxy/proxy.module';
+import { RealEstateModule } from './modules/real-estate/real-estate.module';
 
 @Module({
     imports: [
@@ -17,7 +18,8 @@ import { ProxyModule } from './modules/proxy/proxy.module';
         PostgresModule,
         UserModule,
         CommonModule,
-        ProxyModule
+        ProxyModule,
+        RealEstateModule
     ],
     controllers: [AppController],
     providers: [AppService],

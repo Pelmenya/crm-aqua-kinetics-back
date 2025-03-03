@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryColumn } from 'typeorm';
+import { Entity, Column, PrimaryColumn, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
+import { RealEstate } from '../real-estate/real-estate.entity';
 
 export enum UserRole {
     ADMIN = 'admin',
@@ -43,6 +44,15 @@ export class User {
 
     @Column({ default: false })
     is_auth: boolean;
+
+    @OneToMany(() => RealEstate, realEstate => realEstate.user, { nullable: true })
+    realEstate: RealEstate;
+
+    @CreateDateColumn({ type: 'timestamp' })
+    created_at: Date;
+
+    @UpdateDateColumn({ type: 'timestamp' })
+    updated_at: Date;
 
     @Column({
         type: 'enum',

@@ -1,5 +1,6 @@
 import { ConfigService } from '@nestjs/config';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { RealEstate } from 'src/modules/real-estate/real-estate.entity';
 import { User } from 'src/modules/user/user.entity';
 
 export const getPostgresConfig = async (
@@ -13,7 +14,8 @@ export const getPostgresConfig = async (
         password: configService.get('POSTGRES_PASSWORD'),
         database: configService.get('POSTGRES_DB'),
         entities: [
-            User
+            User,
+            RealEstate,
         ],
         synchronize: true,
     };

@@ -1,10 +1,9 @@
 import { Body, Controller, Post, Put, Req, UnauthorizedException, UseGuards } from '@nestjs/common';
-import { Request } from 'express';
 import { AuthService } from './auth.service';
 import { AuthGuard } from './auth.guard';
-import { User } from '../user/user.entity';
 import { UserRepository } from '../user/user.repository';
 import { UserCreateDto } from '../user/user.create.dto';
+import { TRequestWithUser } from 'src/types/t-request-with-user';
 
 
 @UseGuards(AuthGuard)
@@ -15,7 +14,7 @@ export class AuthController {
         private readonly userRepository: UserRepository,
     ) { }
     @Post('init')
-    async authorize(@Req() req: Request & User) {
+    async authorize(@Req() req: TRequestWithUser) {
 
         const initData = await this.authService.validateInitData(req);
         return initData;
@@ -23,7 +22,7 @@ export class AuthController {
 
 
     @Put('register')
-    async register(@Req() req: Request & User, @Body() body: Partial<UserCreateDto>) {
+    async register(@Req() req: TRequestWithUser, @Body() body: Partial<UserCreateDto>) {
         const user = req.user;
 
         if (!user) {
