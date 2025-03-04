@@ -19,8 +19,8 @@ export class CreateRealEstateDto {
 
     @IsOptional()
     @IsObject()
-    coordinates?: { type: 'Point'; coordinates: [number, number] };
-
+    coordinates?: { type: string; coordinates: [number, number] };
+    
     @IsObject()
     waterIntakePoints: {
         toilet: number;

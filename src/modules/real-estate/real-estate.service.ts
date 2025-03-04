@@ -10,14 +10,22 @@ export class RealEstateService {
     constructor(private readonly realEstateRepository: RealEstateRepository) {}
 
     async createRealEstate(createRealEstateDto: CreateRealEstateDto, userId: number): Promise<RealEstate> {
-        const realEstate = new RealEstate();
-        Object.assign(realEstate, createRealEstateDto);
-        // Устанавливаем `user` с объектом, содержащим только `id`
-        realEstate.user = { id: userId } as User;
-        
-        return await this.realEstateRepository.createRealEstate(realEstate);
-    }
+        const { coordinates, ...otherData } = createRealEstateDto;
+    
+        console.log(createRealEstateDto);
 
+        const realEstate = await this.realEstateRepository.createRealEstate({
+            ...otherData,
+            coordinates: coordinates ? {
+                type: 'Point',
+                coordinates: coordinates.coordinates
+            } : null,
+            user: { id: userId } as User
+        });
+    
+        return realEstate;
+    }
+    
     async getRealEstatesByUser(userId: number): Promise<RealEstate[]> {
         return await this.realEstateRepository.findRealEstatesByUser(userId);
     }
@@ -27,7 +35,17 @@ export class RealEstateService {
     }
 
     async updateRealEstate(id: number, updateRealEstateDto: UpdateRealEstateDto): Promise<RealEstate> {
-        return await this.realEstateRepository.updateRealEstate(id, updateRealEstateDto);
+        const { coordinates, ...otherData } = updateRealEstateDto;
+    
+        const updateRealEstate = await this.realEstateRepository.updateRealEstate(id, {
+            ...otherData,
+            coordinates: coordinates ? {
+                type: 'Point',
+                coordinates: coordinates.coordinates
+            } : null,
+        });
+
+        return updateRealEstate;
     }
 
     async deleteRealEstate(id: number): Promise<void> {
