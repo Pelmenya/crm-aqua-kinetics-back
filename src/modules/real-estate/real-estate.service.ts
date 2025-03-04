@@ -11,9 +11,6 @@ export class RealEstateService {
 
     async createRealEstate(createRealEstateDto: CreateRealEstateDto, userId: number): Promise<RealEstate> {
         const { coordinates, ...otherData } = createRealEstateDto;
-    
-        console.log(createRealEstateDto);
-
         const realEstate = await this.realEstateRepository.createRealEstate({
             ...otherData,
             coordinates: coordinates ? {
@@ -45,7 +42,7 @@ export class RealEstateService {
             } : null,
         });
 
-        return updateRealEstate;
+        return updateRealEstate
     }
 
     async deleteRealEstate(id: number): Promise<void> {
