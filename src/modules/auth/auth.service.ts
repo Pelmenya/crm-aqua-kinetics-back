@@ -26,7 +26,7 @@ export class AuthService {
 
         try {
             // Валидация данных
-            validate(authData, this.botToken);
+            validate(authData, this.botToken, { expiresIn: 0 });
             const userData = parse(authData);
 
             // Попробуем найти пользователя в базе данных
@@ -35,7 +35,7 @@ export class AuthService {
             // Если пользователь не найден, создаем нового
             if (!user) {
                 user = await this.userRepository.createUser({
-                    id: userData.user.id,
+                    id: Number(userData.user.id),
                     first_name: userData.user.first_name,
                     last_name: userData.user.last_name,
                     username: userData.user.username,
@@ -55,7 +55,7 @@ export class AuthService {
             return user;
 
         } catch (error) {
-            throw new UnauthorizedException('Invalid or expired token');
+            throw new UnauthorizedException(error);
         }
     }
 }

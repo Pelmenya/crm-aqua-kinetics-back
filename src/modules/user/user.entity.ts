@@ -9,9 +9,9 @@ export enum UserRole {
 }
 @Entity()
 export class User {
-    @PrimaryColumn()
-    id: number; // ID будет использоваться как Primary Key и будет совпадать с Telegram ID
-
+    @PrimaryColumn({ type: 'bigint' })
+    id: number;
+    
     @Column()
     allows_write_to_pm: boolean;
 
