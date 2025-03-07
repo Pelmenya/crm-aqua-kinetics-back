@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryColumn, CreateDateColumn, UpdateDateColumn, OneToMany, OneToOne } from 'typeorm';
+import { Entity, Column, PrimaryColumn, CreateDateColumn, UpdateDateColumn, OneToMany, OneToOne, JoinColumn } from 'typeorm';
 import { RealEstate } from '../client/modules/real-estate/real-estate.entity';
 import { AccountService } from '../service/modules/account-service/account-service.entity';
 
@@ -48,8 +48,9 @@ export class User {
 
     @OneToMany(() => RealEstate, realEstate => realEstate.user, { nullable: true })
     realEstate: RealEstate;
-
+        
     @OneToOne(() => AccountService , accountService => accountService.user, { nullable: true })
+    @JoinColumn() // Указывает колонку для соединения
     accountService: AccountService;
 
     @CreateDateColumn({ type: 'timestamp' })

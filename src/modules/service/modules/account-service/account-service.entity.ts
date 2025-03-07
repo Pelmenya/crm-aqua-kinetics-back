@@ -5,7 +5,9 @@ import { User } from '../../../user/user.entity';
 export class AccountService {
     @PrimaryGeneratedColumn('uuid')
     id: string;
-
+    @Column({ nullable: true })
+    address: string;
+    
     @Column('geometry', { nullable: true, spatialFeatureType: 'Point', srid: 4326 })
     coordinates: { type: 'Point', coordinates: [number, number] };
 
@@ -18,7 +20,7 @@ export class AccountService {
     @Column({ nullable: true })
     carModel: string;
 
-    @OneToOne(() => User, user => user.accountService, { nullable: false })
+    @OneToOne(() => User, user => user.accountService, { nullable: true })
     user: User;
 
     @CreateDateColumn({ type: 'timestamp' })
