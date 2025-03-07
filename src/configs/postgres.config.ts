@@ -1,6 +1,7 @@
 import { ConfigService } from '@nestjs/config';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { RealEstate } from 'src/modules/real-estate/real-estate.entity';
+import { AccountService } from 'src/modules/service/modules/account-service/account-service.entity';
+import { RealEstate } from 'src/modules/client/modules/real-estate/real-estate.entity';
 import { User } from 'src/modules/user/user.entity';
 
 export const getPostgresConfig = async (
@@ -16,6 +17,7 @@ export const getPostgresConfig = async (
         entities: [
             User,
             RealEstate,
+            AccountService
         ],
         synchronize: true,
     };

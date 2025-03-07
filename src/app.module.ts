@@ -8,7 +8,10 @@ import { PostgresModule } from './modules/postgres/postgres.module';
 import { UserModule } from './modules/user/user.module';
 import { CommonModule } from './modules/common/common.module';
 import { ProxyModule } from './modules/proxy/proxy.module';
-import { RealEstateModule } from './modules/real-estate/real-estate.module';
+import { RealEstateModule } from './modules/client/modules/real-estate/real-estate.module';
+import { AccountServiceModule } from './modules/service/modules/account-service/account-service.module';
+import { ServiceModule } from './modules/service/service.module';
+import { ClientModule } from './modules/client/client.module';
 
 @Module({
     imports: [
@@ -19,7 +22,8 @@ import { RealEstateModule } from './modules/real-estate/real-estate.module';
         UserModule,
         CommonModule,
         ProxyModule,
-        RealEstateModule
+        ServiceModule,
+        ClientModule,
     ],
     controllers: [AppController],
     providers: [AppService],

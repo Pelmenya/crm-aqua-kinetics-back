@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards, Req } from '@nestjs/common';
 import { RealEstateService } from './real-estate.service';
-import { AuthGuard } from '../auth/auth.guard';
+import { AuthGuard } from '../../../auth/auth.guard';
 import { CreateRealEstateDto } from './types/create-real-estate.dto';
 import { UpdateRealEstateDto } from './types/update-real-estate.dto';
 import { TRequestWithUser } from 'src/types/t-request-with-user';

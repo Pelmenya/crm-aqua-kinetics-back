@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { RealEstateRepository } from './real-estate.repository';
 import { RealEstate } from './real-estate.entity';
-import { User } from '../user/user.entity';
+import { User } from '../../../user/user.entity';
 import { CreateRealEstateDto } from './types/create-real-estate.dto';
 import { UpdateRealEstateDto } from './types/update-real-estate.dto';
 

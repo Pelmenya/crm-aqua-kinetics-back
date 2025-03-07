@@ -1,5 +1,6 @@
-import { Entity, Column, PrimaryColumn, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
-import { RealEstate } from '../real-estate/real-estate.entity';
+import { Entity, Column, PrimaryColumn, CreateDateColumn, UpdateDateColumn, OneToMany, OneToOne } from 'typeorm';
+import { RealEstate } from '../client/modules/real-estate/real-estate.entity';
+import { AccountService } from '../service/modules/account-service/account-service.entity';
 
 export enum UserRole {
     ADMIN = 'admin',
@@ -47,6 +48,9 @@ export class User {
 
     @OneToMany(() => RealEstate, realEstate => realEstate.user, { nullable: true })
     realEstate: RealEstate;
+
+    @OneToOne(() => AccountService , accountService => accountService.user, { nullable: true })
+    accountService: AccountService;
 
     @CreateDateColumn({ type: 'timestamp' })
     created_at: Date;
