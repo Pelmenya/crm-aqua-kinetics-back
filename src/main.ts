@@ -1,7 +1,6 @@
 import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
-import { RolesGuard } from './modules/user/user.role.guard';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
@@ -23,8 +22,6 @@ async function bootstrap() {
         }),
     );
 
-    const reflector = app.get(Reflector);
-    app.useGlobalGuards(new RolesGuard(reflector));
         // Настройка Swagger
         const config = new DocumentBuilder()
         .setTitle('Hotel Aggregator API')

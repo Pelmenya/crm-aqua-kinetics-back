@@ -9,11 +9,13 @@ import { CreateAccountServiceDto } from './modules/account-service/types/create-
 import { TRequestWithUser } from 'src/types/t-request-with-user';
 import { AccountService } from './modules/account-service/account-service.entity';
 
+
 @UseGuards(AuthGuard, RolesGuard)
 @Controller('service')
 export class ServiceController { 
     constructor(private readonly accountServiceService: AccountServiceService) { }
 
+    @Roles(UserRole.SERVICE)
     @Post('account')
     async createAccountService(@Body() createAccountServiceDto: CreateAccountServiceDto, @Req() req: TRequestWithUser): Promise<AccountService> {
         const userId = req.user.id;
