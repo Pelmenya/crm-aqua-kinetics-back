@@ -1,13 +1,15 @@
-import { Entity, Column, CreateDateColumn, UpdateDateColumn, OneToMany, PrimaryGeneratedColumn, OneToOne } from 'typeorm';
+import { Entity, Column, CreateDateColumn, UpdateDateColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { User } from '../../../user/user.entity';
+import { TWorkDay } from 'src/types/t-work-day';
 
 @Entity()
 export class AccountService {
     @PrimaryGeneratedColumn('uuid')
     id: string;
+
     @Column({ nullable: true })
     address: string;
-    
+
     @Column('geometry', { nullable: true, spatialFeatureType: 'Point', srid: 4326 })
     coordinates: { type: 'Point', coordinates: [number, number] };
 
@@ -28,4 +30,8 @@ export class AccountService {
 
     @UpdateDateColumn({ type: 'timestamp' })
     updated_at: Date;
+
+    // Упрощенное поле для рабочих дней
+    @Column('json', { nullable: true })
+    workDays: TWorkDay[];
 }

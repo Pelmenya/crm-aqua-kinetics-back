@@ -11,7 +11,7 @@ export class AccountServiceService {
 
     async createOrUpdateAccountService(createAccountServiceDto: CreateAccountServiceDto, userId: number): Promise<AccountService> {
         const existingAccountService = await this.accountServiceRepository.findAccountServiceByUserId(userId);
-        
+
         if (existingAccountService) {
             // If the account service exists, update it
             return await this.updateAccountService(existingAccountService.id, createAccountServiceDto);
@@ -22,13 +22,14 @@ export class AccountServiceService {
     }
 
     private async createAccountService(createAccountServiceDto: CreateAccountServiceDto, userId: number): Promise<AccountService> {
-        const { coordinates, radiusKm, carNumber, carModel, address } = createAccountServiceDto;
+        const { coordinates, radiusKm, carNumber, carModel, address, workDays } = createAccountServiceDto;
         const accountService = await this.accountServiceRepository.createAccountService({
             coordinates: { type: 'Point', coordinates: coordinates.coordinates },
             radiusKm,
             carNumber,
             carModel,
             address,
+            workDays,
             user: { id: userId } as User,
         });
 
@@ -36,13 +37,14 @@ export class AccountServiceService {
     }
 
     private async updateAccountService(id: string, updateAccountServiceDto: UpdateAccountServiceDto): Promise<AccountService> {
-        const { coordinates, radiusKm, carNumber, carModel, address } = updateAccountServiceDto;
+        const { coordinates, radiusKm, carNumber, carModel, address, workDays } = updateAccountServiceDto;
         return await this.accountServiceRepository.updateAccountService(id, {
             coordinates: coordinates ? { type: 'Point', coordinates: coordinates.coordinates } : undefined,
-            radiusKm,
-            carNumber,
-            carModel,
-            address,
+            radiusKm: radiusKm ? radiusKm : undefined,
+            carNumber: carNumber ? carNumber: undefined,
+            carModel: carModel? carModel : undefined,
+            address: address ? address : undefined,
+            workDays: workDays ? workDays: undefined,
         });
     }
 
