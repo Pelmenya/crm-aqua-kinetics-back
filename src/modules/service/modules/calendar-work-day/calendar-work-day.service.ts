@@ -17,9 +17,9 @@ export class CalendarWorkDayService {
         if (!workDays || workDays.length === 0) return;
 
         const today = new Date();
-        const oneMonthLater = addDays(today, 60);
+        const twoMonthLater = addDays(today, 60);
 
-        const daysInRange = eachDayOfInterval({ start: today, end: oneMonthLater });
+        const daysInRange = eachDayOfInterval({ start: today, end: twoMonthLater });
 
         for (const currentDate of daysInRange) {
             const dayOfWeek = currentDate.getDay();
@@ -29,10 +29,8 @@ export class CalendarWorkDayService {
             );
 
             if (matchingWorkDay) {
-                // Используем метод для проверки существования дня
-                const existingWorkDay = await this.calendarWorkDayRepository.findOneByDateAndAccountServiceId(currentDate, accountService.id);
-
-                if (!existingWorkDay) {
+                try {
+                    // Проверка на существование дня
                     const { startHour, startMinute, endHour, endMinute } = matchingWorkDay;
                     const createDto: CreateCalendarWorkDayDto = {
                         date: currentDate,
@@ -44,6 +42,11 @@ export class CalendarWorkDayService {
                     };
 
                     await this.calendarWorkDayRepository.createCalendarWorkDay(createDto, accountService.id);
+                } catch (error) {
+                    if (error.code !== '23505') { // PostgreSQL error code for unique violation
+                        throw error;
+                    }
+                    // Игнорируем ошибку уникальности, так как запись уже существует. По идее уже ее не будет, т.к. Insert напрямую
                 }
             }
         }

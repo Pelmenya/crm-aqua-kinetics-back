@@ -1,7 +1,8 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, Index } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, Index, Unique } from 'typeorm';
 import { AccountService } from '../account-service/account-service.entity';
 
 @Entity()
+@Unique(['date', 'accountService'])
 export class CalendarWorkDay {
     @PrimaryGeneratedColumn('uuid')
     id: string;
