@@ -8,12 +8,16 @@ import { UserRole } from '../user/user.entity';
 import { CreateAccountServiceDto } from './modules/account-service/types/create-account-service.dto';
 import { TRequestWithUser } from 'src/types/t-request-with-user';
 import { AccountService } from './modules/account-service/account-service.entity';
+import { CalendarWorkDayService } from './modules/calendar-work-day/calendar-work-day.service';
 
 
 @UseGuards(AuthGuard, RolesGuard)
 @Controller('service')
-export class ServiceController { 
-    constructor(private readonly accountServiceService: AccountServiceService) { }
+export class ServiceController {
+    constructor(
+        private readonly accountServiceService: AccountServiceService,
+        private readonly calendarWorkDayService: CalendarWorkDayService,
+    ) { }
 
     @Roles(UserRole.SERVICE)
     @Post('account')
@@ -33,5 +37,16 @@ export class ServiceController {
     @Delete('account/:id')
     async deleteAccountService(@Param('id') id: string): Promise<void> {
         return this.accountServiceService.deleteAccountService(id);
+    }
+
+    @Roles(UserRole.SERVICE)
+    @Post('fill-calendar')
+    async fillCalendar(@Req() req: TRequestWithUser): Promise<void> {
+        const userId = req.user.id;
+        const accountService = await this.accountServiceService.getAccountServiceByUserId(userId);
+
+        if (accountService) {
+            await this.calendarWorkDayService.fillCalendar(accountService);
+        }
     }
 }
