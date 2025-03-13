@@ -3,6 +3,7 @@ import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { AccountService } from 'src/modules/service/modules/account-service/account-service.entity';
 import { RealEstate } from 'src/modules/client/modules/real-estate/real-estate.entity';
 import { User } from 'src/modules/user/user.entity';
+import { CalendarWorkDay } from 'src/modules/service/modules/calendar-work-day/calendar-work-day.entity';
 
 export const getPostgresConfig = async (
     configService: ConfigService,
@@ -17,7 +18,8 @@ export const getPostgresConfig = async (
         entities: [
             User,
             RealEstate,
-            AccountService
+            AccountService,
+            CalendarWorkDay,
         ],
         synchronize: true,
     };

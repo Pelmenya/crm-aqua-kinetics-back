@@ -10,7 +10,7 @@ export enum UserRole {
 }
 @Entity()
 export class User {
-    @PrimaryColumn({ type: 'bigint' })
+    @PrimaryColumn({ type: 'bigint' }) // Id как в Telegram
     id: number;
     
     @Column()

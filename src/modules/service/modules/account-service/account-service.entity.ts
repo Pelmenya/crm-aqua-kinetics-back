@@ -1,6 +1,7 @@
-import { Entity, Column, CreateDateColumn, UpdateDateColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, CreateDateColumn, UpdateDateColumn, OneToOne, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 import { User } from '../../../user/user.entity';
 import { TWorkDay } from 'src/types/t-work-day';
+import { CalendarWorkDay } from '../calendar-work-day/calendar-work-day.entity';
 
 @Entity()
 export class AccountService {
@@ -31,7 +32,11 @@ export class AccountService {
     @UpdateDateColumn({ type: 'timestamp' })
     updated_at: Date;
 
-    // Упрощенное поле для рабочих дней
+    // Матрица для рабочих дней
     @Column('json', { nullable: true })
     workDays: TWorkDay[];
+
+    @OneToMany(() => CalendarWorkDay, calendarWorkDay => calendarWorkDay.accountService)
+    calendarWorkDays: CalendarWorkDay[];
+
 }
