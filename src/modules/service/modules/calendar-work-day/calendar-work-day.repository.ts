@@ -22,6 +22,15 @@ export class CalendarWorkDayRepository {
         });
     }
 
+    async findOneByDateAndAccountServiceId(date: Date, accountServiceId: string): Promise<CalendarWorkDay | null> {
+        return await this.calendarWorkDayRepository.findOne({
+            where: {
+                date,
+                accountService: { id: accountServiceId },
+            },
+        });
+    }
+
     async removeCalendarWorkDay(id: string): Promise<void> {
         await this.calendarWorkDayRepository.delete(id);
     }

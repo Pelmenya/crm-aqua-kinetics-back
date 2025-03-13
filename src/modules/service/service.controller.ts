@@ -9,6 +9,7 @@ import { CreateAccountServiceDto } from './modules/account-service/types/create-
 import { TRequestWithUser } from 'src/types/t-request-with-user';
 import { AccountService } from './modules/account-service/account-service.entity';
 import { CalendarWorkDayService } from './modules/calendar-work-day/calendar-work-day.service';
+import { CalendarWorkDay } from './modules/calendar-work-day/calendar-work-day.entity';
 
 
 @UseGuards(AuthGuard, RolesGuard)
@@ -41,12 +42,15 @@ export class ServiceController {
 
     @Roles(UserRole.SERVICE)
     @Post('fill-calendar')
-    async fillCalendar(@Req() req: TRequestWithUser): Promise<void> {
+    async fillCalendar(@Req() req: TRequestWithUser): Promise<CalendarWorkDay[]> {
         const userId = req.user.id;
         const accountService = await this.accountServiceService.getAccountServiceByUserId(userId);
 
         if (accountService) {
             await this.calendarWorkDayService.fillCalendar(accountService);
+            return this.calendarWorkDayService.getCalendar(accountService.id);
         }
+
+        return [];
     }
 }
