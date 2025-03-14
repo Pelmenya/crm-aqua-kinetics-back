@@ -66,4 +66,11 @@ export class CalendarWorkDayRepository {
         await this.calendarWorkDayRepository.save(workDay);
         return { success: true };
     }
+
+    async findLastFilledDay(accountServiceId: string): Promise<CalendarWorkDay | null> {
+        return await this.calendarWorkDayRepository.findOne({
+            where: { accountService: { id: accountServiceId } },
+            order: { date: 'DESC' },
+        });
+    }
 }

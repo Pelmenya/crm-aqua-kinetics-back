@@ -31,5 +31,5 @@ export class CreateCalendarWorkDayDto {
 
     @IsOptional()
     @IsBoolean()
-    isDelete: boolean;
+    isDeleted: boolean;
 }
