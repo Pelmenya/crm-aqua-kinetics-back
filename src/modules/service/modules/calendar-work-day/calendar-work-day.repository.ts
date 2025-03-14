@@ -11,41 +11,35 @@ export class CalendarWorkDayRepository {
         @InjectRepository(CalendarWorkDay)
         private readonly calendarWorkDayRepository: Repository<CalendarWorkDay>,
         private readonly dataSource: DataSource,
-    ) {}
+    ) { }
 
     async createCalendarWorkDay(data: CreateCalendarWorkDayDto, accountServiceId: string): Promise<CalendarWorkDay | null> {
         const queryRunner = this.dataSource.createQueryRunner();
-    
+
         await queryRunner.connect();
         await queryRunner.startTransaction();
-    
+
         try {
             const result = await queryRunner.manager.query(
                 `INSERT INTO "calendar_work_day" ("date", "dayOfWeek", "startHour", "startMinute", "endHour", "endMinute", "accountServiceId")
                  VALUES ($1, $2, $3, $4, $5, $6, $7)
-                 ON CONFLICT ("date", "accountServiceId") DO UPDATE SET
-                    "dayOfWeek" = EXCLUDED."dayOfWeek",
-                    "startHour" = EXCLUDED."startHour",
-                    "startMinute" = EXCLUDED."startMinute",
-                    "endHour" = EXCLUDED."endHour",
-                    "endMinute" = EXCLUDED."endMinute",
-                    "isDeleted" = false
+                 ON CONFLICT ("date", "accountServiceId") DO NOTHING
                  RETURNING *`,
                 [data.date, data.dayOfWeek, data.startHour, data.startMinute, data.endHour, data.endMinute, accountServiceId]
             );
-    
+
             await queryRunner.commitTransaction();
-    
+
             return result[0] ? result[0] as CalendarWorkDay : null;
         } catch (error) {
             await queryRunner.rollbackTransaction();
-            console.error('Error inserting or updating calendar work day:', error);
+            console.error('Error inserting calendar work day:', error);
             return null;
         } finally {
             await queryRunner.release();
         }
     }
-    
+
     async findCalendarWorkDaysByAccountServiceId(accountServiceId: string): Promise<CalendarWorkDay[]> {
         return await this.calendarWorkDayRepository.find({
             where: { accountService: { id: accountServiceId }, isDeleted: false },
@@ -80,7 +74,12 @@ export class CalendarWorkDayRepository {
     async findDaysOutOfRange(accountServiceId: string, endDate: Date): Promise<CalendarWorkDay[]> {
         // Находим все дни, которые находятся после endDate
         return await this.calendarWorkDayRepository.find({
-            where: { accountService: { id: accountServiceId }, date: MoreThan(endDate), isDeleted: false },
+            where: { accountService: { id: accountServiceId }, date: MoreThan(endDate) },
         });
+    }
+
+    async deleteCalendarWorkDay(workDay: CalendarWorkDay): Promise<TSuccess> {
+        await this.calendarWorkDayRepository.remove(workDay);
+        return { success: true };
     }
 }

@@ -83,7 +83,7 @@ export class CalendarWorkDayService {
         // Находим и "удаляем" все дни, которые выходят за пределы endDate, т.е следующие за ней
         const outOfRangeDays = await this.calendarWorkDayRepository.findDaysOutOfRange(accountService.id, endDate);
         for (const day of outOfRangeDays) {
-            await this.calendarWorkDayRepository.markCalendarWorkDayAsDeleted(day);
+            await this.calendarWorkDayRepository.deleteCalendarWorkDay(day);
         }
     
         // Возвращаем все дни календаря для данного AccountService
