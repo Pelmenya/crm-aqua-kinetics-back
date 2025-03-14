@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, Index, Unique } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, Index, Unique, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { AccountService } from '../account-service/account-service.entity';
 
 @Entity()
@@ -28,4 +28,13 @@ export class CalendarWorkDay {
 
     @ManyToOne(() => AccountService, accountService => accountService.calendarWorkDays, { onDelete: 'CASCADE' })
     accountService: AccountService;
+
+    @Column({ default: false })
+    isDeleted: boolean;
+
+    @CreateDateColumn({ type: 'timestamp' })
+    created_at: Date;
+
+    @UpdateDateColumn({ type: 'timestamp' })
+    updated_at: Date;
 }

@@ -1,4 +1,4 @@
-import { IsDateString, IsInt, Min, Max } from 'class-validator';
+import { IsDateString, IsInt, Min, Max, IsOptional, IsBoolean } from 'class-validator';
 
 export class CreateCalendarWorkDayDto {
     @IsDateString()
@@ -28,4 +28,8 @@ export class CreateCalendarWorkDayDto {
     @Min(0)
     @Max(59)
     endMinute: number;
+
+    @IsOptional()
+    @IsBoolean()
+    isDelete: boolean;
 }

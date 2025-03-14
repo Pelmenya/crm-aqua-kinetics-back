@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
 import { CalendarWorkDay } from './calendar-work-day.entity';
 import { CreateCalendarWorkDayDto } from './types/create-calendar-work-day.dto';
+import { TSuccess } from 'src/types/t-success';
 
 @Injectable()
 export class CalendarWorkDayRepository {
@@ -10,7 +11,7 @@ export class CalendarWorkDayRepository {
         @InjectRepository(CalendarWorkDay)
         private readonly calendarWorkDayRepository: Repository<CalendarWorkDay>,
         private readonly dataSource: DataSource,
-    ) { }
+    ) {}
 
     async createCalendarWorkDay(data: CreateCalendarWorkDayDto, accountServiceId: string): Promise<CalendarWorkDay | null> {
         const queryRunner = this.dataSource.createQueryRunner();
@@ -41,11 +42,33 @@ export class CalendarWorkDayRepository {
 
     async findCalendarWorkDaysByAccountServiceId(accountServiceId: string): Promise<CalendarWorkDay[]> {
         return await this.calendarWorkDayRepository.find({
-            where: { accountService: { id: accountServiceId } },
+            where: { accountService: { id: accountServiceId }, isDeleted: false },
         });
     }
 
-    async removeCalendarWorkDay(id: string): Promise<void> {
-        await this.calendarWorkDayRepository.delete(id);
+    async findCalendarWorkDayByDate(accountServiceId: string, date: Date): Promise<CalendarWorkDay | null> {
+        return await this.calendarWorkDayRepository.findOne({
+            where: { accountService: { id: accountServiceId }, date },
+        });
+    }
+
+    async updateCalendarWorkDay(day: CalendarWorkDay, updateDto: Partial<CreateCalendarWorkDayDto>): Promise<TSuccess> {
+
+        const updatedWorkDay = this.calendarWorkDayRepository.merge(day, updateDto);
+
+        await this.calendarWorkDayRepository.save(updatedWorkDay);
+
+        return { success: true };
+    }
+
+    async markCalendarWorkDayAsDeleted(id: string): Promise<TSuccess> {
+        const workDay = await this.calendarWorkDayRepository.findOne({ where: { id } });
+        if (!workDay) {
+            return { success: false };
+        }
+
+        workDay.isDeleted = true;
+        await this.calendarWorkDayRepository.save(workDay);
+        return { success: true };
     }
 }

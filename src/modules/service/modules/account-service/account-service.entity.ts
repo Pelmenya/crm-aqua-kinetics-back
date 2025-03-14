@@ -26,12 +26,6 @@ export class AccountService {
     @OneToOne(() => User, user => user.accountService, { nullable: true })
     user: User;
 
-    @CreateDateColumn({ type: 'timestamp' })
-    created_at: Date;
-
-    @UpdateDateColumn({ type: 'timestamp' })
-    updated_at: Date;
-
     // Матрица для рабочих дней
     @Column('json', { nullable: true })
     workDays: TWorkDay[];
@@ -39,4 +33,9 @@ export class AccountService {
     @OneToMany(() => CalendarWorkDay, calendarWorkDay => calendarWorkDay.accountService)
     calendarWorkDays: CalendarWorkDay[];
 
+    @CreateDateColumn({ type: 'timestamp' })
+    created_at: Date;
+
+    @UpdateDateColumn({ type: 'timestamp' })
+    updated_at: Date;
 }
