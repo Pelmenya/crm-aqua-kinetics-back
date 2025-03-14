@@ -11,7 +11,7 @@ export class CalendarWorkDayService {
     constructor(
         private readonly calendarWorkDayRepository: CalendarWorkDayRepository,
         private readonly accountServiceService: AccountServiceService,
-    ) {}
+    ) { }
 
     async fillCalendar(userId: number): Promise<CalendarWorkDay[]> {
         const accountService = await this.accountServiceService.getAccountServiceByUserId(userId);
@@ -73,8 +73,8 @@ export class CalendarWorkDayService {
                 updateDto.date = new Date(updateDto.date);
                 updateDto.dayOfWeek = updateDto.date.getDay();
                 updateDto.isDelete = false;
+                calendarWorkDay = await this.calendarWorkDayRepository.createCalendarWorkDay(updateDto as CreateCalendarWorkDayDto, accountService.id);
             }
-            calendarWorkDay = await this.calendarWorkDayRepository.createCalendarWorkDay(updateDto as CreateCalendarWorkDayDto, accountService.id);
         } else {
             // Обновляем существующий день
             const { success } = await this.calendarWorkDayRepository.updateCalendarWorkDay(calendarWorkDay, updateDto);
@@ -99,7 +99,7 @@ export class CalendarWorkDayService {
             throw new NotFoundException('Calendar work day not found for this date.');
         }
 
-        const { success } = await this.calendarWorkDayRepository.markCalendarWorkDayAsDeleted(calendarWorkDay.id);
+        const { success } = await this.calendarWorkDayRepository.markCalendarWorkDayAsDeleted(calendarWorkDay);
         if (success) {
             return await this.calendarWorkDayRepository.findCalendarWorkDaysByAccountServiceId(accountService.id);
         }

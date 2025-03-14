@@ -52,21 +52,16 @@ export class CalendarWorkDayRepository {
         });
     }
 
-    async updateCalendarWorkDay(day: CalendarWorkDay, updateDto: Partial<CreateCalendarWorkDayDto>): Promise<TSuccess> {
+    async updateCalendarWorkDay(workDay: CalendarWorkDay, updateDto: Partial<CreateCalendarWorkDayDto>): Promise<TSuccess> {
 
-        const updatedWorkDay = this.calendarWorkDayRepository.merge(day, updateDto);
+        const updatedWorkDay = this.calendarWorkDayRepository.merge(workDay, updateDto);
 
         await this.calendarWorkDayRepository.save(updatedWorkDay);
 
         return { success: true };
     }
 
-    async markCalendarWorkDayAsDeleted(id: string): Promise<TSuccess> {
-        const workDay = await this.calendarWorkDayRepository.findOne({ where: { id } });
-        if (!workDay) {
-            return { success: false };
-        }
-
+    async markCalendarWorkDayAsDeleted(workDay: CalendarWorkDay): Promise<TSuccess> {
         workDay.isDeleted = true;
         await this.calendarWorkDayRepository.save(workDay);
         return { success: true };
