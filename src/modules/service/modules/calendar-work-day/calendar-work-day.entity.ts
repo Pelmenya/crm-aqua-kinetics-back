@@ -26,6 +26,7 @@ export class CalendarWorkDay {
     @Column('int')
     endMinute: number;
 
+    @Index()
     @ManyToOne(() => AccountService, accountService => accountService.calendarWorkDays, { onDelete: 'CASCADE' })
     accountService: AccountService;
 
