@@ -22,7 +22,7 @@ export class AccountServiceService {
     }
 
     private async createAccountService(createAccountServiceDto: CreateAccountServiceDto, userId: number): Promise<AccountService> {
-        const { coordinates, radiusKm, carNumber, carModel, address, workDays } = createAccountServiceDto;
+        const { coordinates, radiusKm, carNumber, carModel, address, workDays, calendarMonths } = createAccountServiceDto;
         const accountService = await this.accountServiceRepository.createAccountService({
             coordinates: { type: 'Point', coordinates: coordinates.coordinates },
             radiusKm,
@@ -30,6 +30,7 @@ export class AccountServiceService {
             carModel,
             address,
             workDays,
+            calendarMonths,
             user: { id: userId } as User,
         });
 
@@ -37,14 +38,15 @@ export class AccountServiceService {
     }
 
     private async updateAccountService(id: string, updateAccountServiceDto: UpdateAccountServiceDto): Promise<AccountService> {
-        const { coordinates, radiusKm, carNumber, carModel, address, workDays } = updateAccountServiceDto;
+        const { coordinates, radiusKm, carNumber, carModel, address, workDays, calendarMonths } = updateAccountServiceDto;
         return await this.accountServiceRepository.updateAccountService(id, {
             coordinates: coordinates ? { type: 'Point', coordinates: coordinates.coordinates } : undefined,
             radiusKm: radiusKm ? radiusKm : undefined,
-            carNumber: carNumber ? carNumber: undefined,
-            carModel: carModel? carModel : undefined,
+            carNumber: carNumber ? carNumber : undefined,
+            carModel: carModel ? carModel : undefined,
             address: address ? address : undefined,
-            workDays: workDays ? workDays: undefined,
+            workDays: workDays ? workDays : undefined,
+            calendarMonths: calendarMonths ? calendarMonths : undefined,
         });
     }
 

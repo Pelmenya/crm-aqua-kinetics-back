@@ -10,53 +10,55 @@ export class CalendarWorkDayService {
     constructor(
         private readonly calendarWorkDayRepository: CalendarWorkDayRepository,
         private readonly accountServiceService: AccountServiceService,
-    ) { }
+    ) {}
 
     async fillCalendar(userId: number): Promise<CalendarWorkDay[]> {
+        // Получаем AccountService для данного пользователя
         const accountService = await this.accountServiceService.getAccountServiceByUserId(userId);
         if (!accountService) {
             throw new NotFoundException('Account service not found for this user.');
         }
     
-        // Получаем последний заполненный день из базы данных.
+        // Получаем последний заполненный день из базы данных
         const lastFilledDay = await this.calendarWorkDayRepository.findLastFilledDay(accountService.id);
     
-        // Определяем текущую дату и конечную дату (через два месяца от текущей даты).
+        // Определяем текущую дату и конечную дату (через несколько месяцев от текущей даты, согласно accountService.calendarMonths)
         const today = new Date();
-        const twoMonthsFromToday = addDays(today, 60);
+        const anyMonthsFromToday = addDays(today, accountService.calendarMonths * 30);
     
-        // Если есть последний заполненный день, начинаем с него, иначе – с текущей даты.
+        // Если есть последний заполненный день, начинаем с него, иначе – с текущей даты
         const startDate = lastFilledDay && lastFilledDay.date > today ? addDays(lastFilledDay.date, 1) : today;
     
-        // Устанавливаем конечную дату заполнения (не более двух месяцев от текущей даты).
-        const endDate = twoMonthsFromToday;
+        // Устанавливаем конечную дату заполнения
+        const endDate = anyMonthsFromToday;
     
-        // Получаем список рабочих дней, определённых для данного accountService.
+        // Получаем список рабочих дней, определённых для данного AccountService
         const workDays = accountService.workDays;
     
-        // Если рабочих дней нет, возвращаем список дней.
+        // Если рабочих дней нет, возвращаем существующие записи календаря
         if (!workDays || workDays.length === 0) {
             return await this.calendarWorkDayRepository.findCalendarWorkDaysByAccountServiceId(accountService.id);
         };
-    
-        // Определяем диапазон дней, которые будем заполнять в календаре.
+
+        // Определяем диапазон дней, которые будем заполнять в календаре
         const daysInRange = eachDayOfInterval({ start: startDate, end: endDate });
-    
-        // Проходим по каждому дню в диапазоне.
+
+        // Проходим по каждому дню в диапазоне
         for (const currentDate of daysInRange) {
             const dayOfWeek = currentDate.getDay();
     
+            // Поиск подходящего рабочего дня на основе дня недели
             const matchingWorkDay = workDays.find(
                 (workDay) => workDay.dayOfWeek === dayOfWeek,
             );
-    
-            // Если найден подходящий рабочий день, создаем запись в календаре.
+
+            // Если найден подходящий рабочий день, создаем запись в календаре
             if (matchingWorkDay) {
                 try {
-                    // Извлекаем параметры начала и конца рабочего дня.
+                    // Извлекаем параметры начала и конца рабочего дня
                     const { startHour, startMinute, endHour, endMinute } = matchingWorkDay;
     
-                    // Создаем DTO для нового рабочего дня.
+                    // Создаем DTO для нового рабочего дня
                     const createDto: CreateCalendarWorkDayDto = {
                         date: currentDate,
                         dayOfWeek,
@@ -66,19 +68,25 @@ export class CalendarWorkDayService {
                         endMinute,
                         isDeleted: false,
                     };
-    
-                    // Пытаемся создать новый рабочий день в базе данных.
+
+                    // Пытаемся создать новый рабочий день в базе данных
                     await this.calendarWorkDayRepository.createCalendarWorkDay(createDto, accountService.id);
                 } catch (error) {
-                    // Если возникает ошибка, не связанная с уникальностью (например, день уже существует), выбрасываем её.
+                    // Если возникает ошибка, не связанная с уникальностью (например, день уже существует), выбрасываем её
                     if (error.code !== '23505') {  // Код ошибки уникальности в PostgreSQL
                         throw error;
                     }
                 }
             }
         }
+
+        // Находим и "удаляем" все дни, которые выходят за пределы endDate, т.е следующие за ней
+        const outOfRangeDays = await this.calendarWorkDayRepository.findDaysOutOfRange(accountService.id, endDate);
+        for (const day of outOfRangeDays) {
+            await this.calendarWorkDayRepository.markCalendarWorkDayAsDeleted(day);
+        }
     
-        // Возвращаем все дни календаря для данного accountService.
+        // Возвращаем все дни календаря для данного AccountService
         return await this.calendarWorkDayRepository.findCalendarWorkDaysByAccountServiceId(accountService.id);
     }
 

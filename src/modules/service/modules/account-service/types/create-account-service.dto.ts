@@ -47,4 +47,9 @@ export class CreateAccountServiceDto {
     @Type(() => WorkDayDto)
     @IsOptional()
     workDays?: WorkDayDto[];
+
+    @IsOptional()
+    @IsNumber()
+    calendarMonths?: number;
+
 }
