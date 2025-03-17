@@ -12,6 +12,7 @@ import { RealEstateModule } from './modules/client/modules/real-estate/real-esta
 import { AccountServiceModule } from './modules/service/modules/account-service/account-service.module';
 import { ServiceModule } from './modules/service/service.module';
 import { ClientModule } from './modules/client/client.module';
+import { MoySkladModule } from './modules/moy-sklad/moy-sklad.module';
 
 @Module({
     imports: [
@@ -24,6 +25,7 @@ import { ClientModule } from './modules/client/client.module';
         ProxyModule,
         ServiceModule,
         ClientModule,
+        MoySkladModule,
     ],
     controllers: [AppController],
     providers: [AppService],
