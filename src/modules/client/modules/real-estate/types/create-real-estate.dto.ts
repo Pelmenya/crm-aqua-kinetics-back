@@ -3,6 +3,7 @@ import { IsString, IsNumber, IsOptional, IsEnum, IsObject } from 'class-validato
 enum ActiveType {
     HOUSE = 'house',
     APARTMENT = 'apartment',
+    PROM = 'prom'
 }
 
 enum ActiveSource {
