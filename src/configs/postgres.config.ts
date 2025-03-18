@@ -4,6 +4,7 @@ import { AccountService } from 'src/modules/service/modules/account-service/acco
 import { RealEstate } from 'src/modules/client/modules/real-estate/real-estate.entity';
 import { User } from 'src/modules/user/user.entity';
 import { CalendarWorkDay } from 'src/modules/service/modules/calendar-work-day/calendar-work-day.entity';
+import { ProductDisplaySetting } from 'src/modules/moy-sklad/modules/product/product-display-setting.entity';
 
 export const getPostgresConfig = async (
     configService: ConfigService,
@@ -20,6 +21,7 @@ export const getPostgresConfig = async (
             RealEstate,
             AccountService,
             CalendarWorkDay,
+            ProductDisplaySetting,
         ],
         synchronize: true,
     };
