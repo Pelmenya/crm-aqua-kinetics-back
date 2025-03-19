@@ -14,7 +14,7 @@ export class ProductService {
     constructor(
         private readonly httpService: HttpService,
         private readonly configService: ConfigService,
-        private readonly productDisplaySettingService: ProductDisplaySettingRepository,
+        private readonly productDisplaySettingRepository: ProductDisplaySettingRepository,
     ) {
         this.authToken = this.configService.get<string>('MOY_SKLAD_API_KEY');
         this.apiHost = this.configService.get<string>('MOY_SKLAD_API_HOST');
@@ -35,22 +35,28 @@ export class ProductService {
     async getProducts(params: SearchBaseParams) {
         const { q, limit, offset } = params;
     
-        // Получаем список видимых групп по именам
-        const visibleGroupNames = await this.productDisplaySettingService.findVisibleGroupNames();
+        // Получаем список видимых путей
+        const visiblePathNames = await this.productDisplaySettingRepository.findVisiblePathNames();
     
-        // Если нет видимых групп, возвращаем пустой массив
-        if (visibleGroupNames.length === 0) {
+        // Если нет видимых путей, возвращаем пустой массив
+        if (visiblePathNames.length === 0) {
             return [];
         }
     
-        // Формируем строку для фильтрации по имени группы
-        const filterQuery = [visibleGroupNames[0]].map(name => `pathName=${name}`);
-    console.log(filterQuery)
+        // Формируем строку для фильтрации по pathName
+        const filterQuery = visiblePathNames.map(pathName => `pathName=${pathName}`).join(';');
+    
         try {
             const response = await firstValueFrom(
-                this.httpService.get(`${this.apiHost}/entity/product?filter=pathName=Товары для продажи/Waterboss/Waterboss`, {
+                this.httpService.get(`${this.apiHost}/entity/product`, {
                     headers: {
                         'Authorization': `Bearer ${this.authToken}`,
+                    },
+                    params: {
+                        search: q,
+                        limit,
+                        offset,
+                        filter: filterQuery, // Используем фильтр по pathName
                     },
                 }).pipe(
                     catchError((error: AxiosError) => {
@@ -67,7 +73,6 @@ export class ProductService {
         }
     }
     
-
     async getProductGroups() {
         const response = await firstValueFrom(
             this.httpService
@@ -91,20 +96,20 @@ export class ProductService {
         const groups = await this.getProductGroups();
 
         for (const group of groups) {
-            const existingSetting = await this.productDisplaySettingService.findByGroupId(group.id);
+            const existingSetting = await this.productDisplaySettingRepository.findByGroupId(group.id);
 
             if (!existingSetting) {
-                await this.productDisplaySettingService.updateDisplaySetting(
+                await this.productDisplaySettingRepository.updateDisplaySetting(
                     group.id,
-                    group.pathName || null, // Сохранение идентификатора родительской группы
+                    group.pathName || null, // Сохранение имени родительской группы
                     false, // По умолчанию скрыты
                     group.name || null // Сохранение имени группы
                 );
             } else {
                 existingSetting.groupName = group.name || existingSetting.groupName;
-                await this.productDisplaySettingService.updateDisplaySetting(
+                await this.productDisplaySettingRepository.updateDisplaySetting(
                     existingSetting.groupId,
-                    existingSetting.parentGroupId,
+                    existingSetting.parentGroupName,
                     existingSetting.shouldDisplay,
                     existingSetting.groupName
                 );
@@ -129,5 +134,9 @@ export class ProductService {
         );
 
         return response.data.rows;
+    }
+
+    async getTopLevelGroups() {
+        return await this.productDisplaySettingRepository.getTopLevelGroups();
     }
 }

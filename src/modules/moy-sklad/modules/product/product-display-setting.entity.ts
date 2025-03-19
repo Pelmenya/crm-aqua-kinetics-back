@@ -9,7 +9,7 @@ export class ProductDisplaySetting {
     groupId: string; // Идентификатор группы в МойСклад
 
     @Column({ nullable: true })
-    parentGroupId: string | null; // Идентификатор родительской группы, если есть
+    parentGroupName: string | null; // Имя родительской группы, если есть
 
     @Column({ nullable: true })
     groupName: string | null; // Имя группы в МойСклад
@@ -18,8 +18,8 @@ export class ProductDisplaySetting {
     shouldDisplay: boolean; // По умолчанию скрыты
 
     @CreateDateColumn({ type: 'timestamp' })
-    created_at: Date;
+    createdAt: Date;
 
     @UpdateDateColumn({ type: 'timestamp' })
-    updated_at: Date;
+    updatedAt: Date;
 }
