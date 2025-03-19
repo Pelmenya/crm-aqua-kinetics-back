@@ -5,6 +5,7 @@ import { RealEstate } from 'src/modules/client/modules/real-estate/real-estate.e
 import { User } from 'src/modules/user/user.entity';
 import { CalendarWorkDay } from 'src/modules/service/modules/calendar-work-day/calendar-work-day.entity';
 import { ProductDisplaySetting } from 'src/modules/moy-sklad/modules/product/product-display-setting.entity';
+import { TopLevelGroupDisplaySetting } from 'src/modules/moy-sklad/modules/product/top-level-group-display-setting.entity';
 
 export const getPostgresConfig = async (
     configService: ConfigService,
@@ -22,6 +23,7 @@ export const getPostgresConfig = async (
             AccountService,
             CalendarWorkDay,
             ProductDisplaySetting,
+            TopLevelGroupDisplaySetting,
         ],
         synchronize: true,
     };

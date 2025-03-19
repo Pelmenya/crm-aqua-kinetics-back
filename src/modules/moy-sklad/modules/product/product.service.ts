@@ -5,6 +5,7 @@ import { AxiosError } from 'axios';
 import { SearchBaseParams } from 'src/types/search-base-params';
 import { ProductDisplaySettingRepository } from './product-display-setting.repository';
 import { ConfigService } from '@nestjs/config';
+import { TopLevelGroupDisplaySettingRepository } from './top-level-group-display-setting.repository'; // Добавьте импорт
 
 @Injectable()
 export class ProductService {
@@ -15,10 +16,11 @@ export class ProductService {
         private readonly httpService: HttpService,
         private readonly configService: ConfigService,
         private readonly productDisplaySettingRepository: ProductDisplaySettingRepository,
+        private readonly topLevelGroupDisplaySettingRepository: TopLevelGroupDisplaySettingRepository, // Добавьте репозиторий
     ) {
         this.authToken = this.configService.get<string>('MOY_SKLAD_API_KEY');
         this.apiHost = this.configService.get<string>('MOY_SKLAD_API_HOST');
-    
+
         // Инициализируем настройки при старте приложения
         this.initializeSettings();
     }
@@ -27,25 +29,36 @@ export class ProductService {
         try {
             await this.updateProductDisplaySettings();
             console.log('Product display settings initialized.');
+
+            // Инициализация верхнеуровневых групп
+            await this.initializeTopLevelGroups();
+            console.log('Top level groups initialized.');
         } catch (error) {
-            console.error('Failed to initialize product display settings:', error);
+            console.error('Failed to initialize settings:', error);
+        }
+    }
+
+    private async initializeTopLevelGroups() {
+        const groups = await this.getProductGroups();
+        for (const group of groups) {
+            if (!group.pathName) {  // Проверяем, что группа является верхнеуровневой
+                await this.topLevelGroupDisplaySettingRepository.saveGroup(group.name);
+            }
         }
     }
 
     async getProducts(params: SearchBaseParams) {
         const { q, limit, offset } = params;
-    
-        // Получаем список видимых путей
-        const visiblePathNames = await this.productDisplaySettingRepository.findVisiblePathNames();
-    
-        // Если нет видимых путей, возвращаем пустой массив
-        if (visiblePathNames.length === 0) {
+
+        // Получаем список видимых верхнеуровневых групп
+        const topLevelGroups = await this.topLevelGroupDisplaySettingRepository.findVisibleGroups();
+
+        if (topLevelGroups.length === 0) {
             return [];
         }
-    
-        // Формируем строку для фильтрации по pathName
-        const filterQuery = visiblePathNames.map(pathName => `pathName=${pathName}`).join(';');
-    
+
+        const filterQuery = topLevelGroups.map(group => `pathName=${group.groupName}`).join(';');
+
         try {
             const response = await firstValueFrom(
                 this.httpService.get(`${this.apiHost}/entity/product`, {
@@ -56,7 +69,7 @@ export class ProductService {
                         search: q,
                         limit,
                         offset,
-                        filter: filterQuery, // Используем фильтр по pathName
+                        filter: filterQuery,
                     },
                 }).pipe(
                     catchError((error: AxiosError) => {
@@ -65,14 +78,13 @@ export class ProductService {
                     }),
                 ),
             );
-    
+
             return response.data.rows;
         } catch (error) {
             console.error('Failed to get products:', error);
             throw error;
         }
     }
-    
     async getProductGroups() {
         const response = await firstValueFrom(
             this.httpService
@@ -137,6 +149,8 @@ export class ProductService {
     }
 
     async getTopLevelGroups() {
-        return await this.productDisplaySettingRepository.getTopLevelGroups();
+        const parentGroupNames = await this.topLevelGroupDisplaySettingRepository.getTopLevelGroups();
+        // пока так вручную, при разработке кабинета админа можно настроить.
+        return await this.productDisplaySettingRepository.getTopLevelGroups(parentGroupNames[0].groupName);
     }
 }

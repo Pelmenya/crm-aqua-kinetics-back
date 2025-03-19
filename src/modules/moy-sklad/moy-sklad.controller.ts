@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Query, Res } from '@nestjs/common';
+import { Controller, Get, Param, Post, Query, Res } from '@nestjs/common';
 import { MoySkladService } from './moy-sklad.service';
 import { Response } from 'express';
 import { SearchBaseParams } from 'src/types/search-base-params';
@@ -32,6 +32,7 @@ export class MoySkladController {
 
     @Get('top-level-groups')
     async getTopLevelGroups(): Promise<ProductDisplaySetting[]> {
-        return this.moySkladService.getTopLevelGroups();
+        return await this.moySkladService.getTopLevelGroups();
     }
+
 }

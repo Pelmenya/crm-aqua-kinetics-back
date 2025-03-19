@@ -45,8 +45,8 @@ export class ProductDisplaySettingRepository {
         }).filter(pathName => pathName.length > 0);
     }
 
-    async getTopLevelGroups(): Promise<ProductDisplaySetting[]> {
+    async getTopLevelGroups(parentGroupName:string): Promise<ProductDisplaySetting[]> {
         // Находим все группы, у которых нет родительской группы
-        return this.settingsRepository.find({ where: { parentGroupName: null, shouldDisplay: true } });
+        return this.settingsRepository.find({ where: { parentGroupName, shouldDisplay: true } });
     }
 }
