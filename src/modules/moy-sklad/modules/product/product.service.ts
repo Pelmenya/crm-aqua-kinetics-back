@@ -39,7 +39,7 @@ export class ProductService {
     }
 
     private async initializeTopLevelGroups() {
-        const groups = await this.getProductGroups();
+        const groups = await this.getGroups();
         for (const group of groups) {
             if (!group.pathName) {  // Проверяем, что группа является верхнеуровневой
                 await this.topLevelGroupDisplaySettingRepository.saveGroup(group.name);
@@ -85,7 +85,7 @@ export class ProductService {
             throw error;
         }
     }
-    async getProductGroups() {
+    async getGroups() {
         const response = await firstValueFrom(
             this.httpService
                 .get(`${this.apiHost}/entity/productfolder`, {
@@ -105,7 +105,7 @@ export class ProductService {
     }
 
     async updateProductDisplaySettings() {
-        const groups = await this.getProductGroups();
+        const groups = await this.getGroups();
 
         for (const group of groups) {
             const existingSetting = await this.productDisplaySettingRepository.findByGroupId(group.id);
@@ -151,6 +151,52 @@ export class ProductService {
     async getTopLevelGroups() {
         const parentGroupNames = await this.topLevelGroupDisplaySettingRepository.getTopLevelGroups();
         // пока так вручную, при разработке кабинета админа можно настроить.
-        return await this.productDisplaySettingRepository.getTopLevelGroups(parentGroupNames[0].groupName);
+        const topLevelGroups = await this.productDisplaySettingRepository.getTopLevelGroups(parentGroupNames[0].groupName);
+
+        return topLevelGroups;
     }
+
+    async getTopLevelGroupsWithBundles() {
+        try {
+            // Получаем список видимых верхнеуровневых групп
+            const topLevelGroups = await this.getTopLevelGroups();
+    
+            if (topLevelGroups.length === 0) {
+                return [];
+            }
+    
+            // Для каждой группы получаем её комплекты
+            const groupsWithBundles = await Promise.all(
+                topLevelGroups.map(async (group) => {
+                    const filterQuery = `pathName=${group.parentGroupName+ '/'+ group.groupName}`; // Фильтрация по pathName
+                    const response = await firstValueFrom(
+                        this.httpService.get(`${this.apiHost}/entity/bundle`, {
+                            headers: {
+                                'Authorization': `Bearer ${this.authToken}`,
+                            },
+                            params: {
+                                filter: filterQuery,
+                            },
+                        }).pipe(
+                            catchError((error: AxiosError) => {
+                                const message = error.message || 'An error occurred';
+                                throw new NotFoundException(message);
+                            }),
+                        ),
+                    );
+                    return {
+                        ...group, // Данные о группе
+                        bundles: response.data.rows, // Комплекты, относящиеся к этой группе
+                    };
+                })
+            );
+    
+            return groupsWithBundles;
+        } catch (error) {
+            console.error('Failed to get top level groups with bundles:', error);
+            throw error;
+        }
+    }
+    
+    
 }

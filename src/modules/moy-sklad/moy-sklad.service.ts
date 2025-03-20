@@ -49,6 +49,6 @@ export class MoySkladService {
     }
 
     async getTopLevelGroups() {
-        return await this.productService.getTopLevelGroups() 
+        return await this.productService.getTopLevelGroupsWithBundles() 
     }
 }
