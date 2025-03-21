@@ -48,44 +48,6 @@ export class GroupService {
         }
     }
 
-    async getProducts(params: SearchBaseParams) {
-        const { q, limit, offset } = params;
-
-        // Получаем список видимых верхнеуровневых групп
-        const topLevelGroups = await this.topLevelGroupDisplaySettingRepository.findVisibleGroups();
-
-        if (topLevelGroups.length === 0) {
-            return [];
-        }
-
-        const filterQuery = topLevelGroups.map(group => `pathName=${group.groupName}`).join(';');
-
-        try {
-            const response = await firstValueFrom(
-                this.httpService.get(`${this.apiHost}/entity/product`, {
-                    headers: {
-                        'Authorization': `Bearer ${this.authToken}`,
-                    },
-                    params: {
-                        search: q,
-                        limit,
-                        offset,
-                        filter: filterQuery,
-                    },
-                }).pipe(
-                    catchError((error: AxiosError) => {
-                        const message = error.message || 'An error occurred';
-                        throw new NotFoundException(message);
-                    }),
-                ),
-            );
-
-            return response.data.rows;
-        } catch (error) {
-            console.error('Failed to get products:', error);
-            throw error;
-        }
-    }
     async getGroups() {
         const response = await firstValueFrom(
             this.httpService
@@ -128,25 +90,6 @@ export class GroupService {
                 );
             }
         }
-    }
-
-    async getProductImages(productId: string) {
-        const response = await firstValueFrom(
-            this.httpService
-                .get(`${this.apiHost}/entity/product/${productId}/images`, {
-                    headers: {
-                        'Authorization': `Bearer ${this.authToken}`,
-                    },
-                })
-                .pipe(
-                    catchError((error: AxiosError) => {
-                        const message = error.message || 'An error occurred';
-                        throw new NotFoundException(message);
-                    }),
-                ),
-        );
-
-        return response.data.rows;
     }
 
     async getTopLevelGroups() {
