@@ -4,7 +4,7 @@ import { HttpService } from '@nestjs/axios';
 import { catchError, firstValueFrom } from 'rxjs';
 import { AxiosError } from 'axios';
 import { SearchBaseParams } from 'src/types/search-base-params';
-import { ProductService } from './modules/product/product.service';
+import { GroupService } from './modules/group/group.service';
 
 @Injectable()
 export class MoySkladService {
@@ -14,18 +14,18 @@ export class MoySkladService {
     constructor(
         private readonly httpService: HttpService,
         private readonly configService: ConfigService,
-        private readonly productService: ProductService,
+        private readonly groupService: GroupService,
     ) {
         this.authToken = this.configService.get<string>('MOY_SKLAD_API_KEY');
         this.apiHost = this.configService.get<string>('MOY_SKLAD_API_HOST');
     }
 
     async getProducts(params: SearchBaseParams) {
-        return await this.productService.getProducts(params);
+        return await this.groupService.getProducts(params);
     }
 
     async getProductImages(productId: string) {
-        return await this.productService.getProductImages(productId);
+        return await this.groupService.getProductImages(productId);
     }
 
     async downloadImage(imageDownloadHref: string) {
@@ -49,6 +49,6 @@ export class MoySkladService {
     }
 
     async getTopLevelGroups() {
-        return await this.productService.getTopLevelGroupsWithBundles() 
+        return await this.groupService.getTopLevelGroupsWithBundles() 
     }
 }

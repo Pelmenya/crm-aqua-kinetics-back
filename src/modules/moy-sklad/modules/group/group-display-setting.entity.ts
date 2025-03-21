@@ -1,7 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
 @Entity()
-export class ProductDisplaySetting {
+export class GroupDisplaySetting {
     @PrimaryGeneratedColumn()
     id: number;
 

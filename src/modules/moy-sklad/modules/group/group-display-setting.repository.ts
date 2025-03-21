@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { ProductDisplaySetting } from './product-display-setting.entity';
+import { GroupDisplaySetting } from './group-display-setting.entity';
 
 @Injectable()
-export class ProductDisplaySettingRepository {
+export class GroupDisplaySettingRepository {
     constructor(
-        @InjectRepository(ProductDisplaySetting)
-        private readonly settingsRepository: Repository<ProductDisplaySetting>,
+        @InjectRepository(GroupDisplaySetting)
+        private readonly settingsRepository: Repository<GroupDisplaySetting>,
     ) { }
 
     async findAll() {
@@ -45,7 +45,7 @@ export class ProductDisplaySettingRepository {
         }).filter(pathName => pathName.length > 0);
     }
 
-    async getTopLevelGroups(parentGroupName:string): Promise<ProductDisplaySetting[]> {
+    async getTopLevelGroups(parentGroupName:string): Promise<GroupDisplaySetting[]> {
         // Находим все группы, у которых нет родительской группы
         return this.settingsRepository.find({ where: { parentGroupName, shouldDisplay: true } });
     }

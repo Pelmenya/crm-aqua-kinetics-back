@@ -2,7 +2,7 @@ import { Controller, Get, Param, Post, Query, Res } from '@nestjs/common';
 import { MoySkladService } from './moy-sklad.service';
 import { Response } from 'express';
 import { SearchBaseParams } from 'src/types/search-base-params';
-import { ProductDisplaySetting } from './modules/product/product-display-setting.entity';
+import { GroupDisplaySetting } from './modules/group/group-display-setting.entity';
 
 @Controller('moysklad')
 export class MoySkladController {
@@ -31,7 +31,7 @@ export class MoySkladController {
     }
 
     @Get('top-level-groups')
-    async getTopLevelGroups(): Promise<ProductDisplaySetting[]> {
+    async getTopLevelGroups(): Promise<GroupDisplaySetting[]> {
         return await this.moySkladService.getTopLevelGroups();
     }
 
