@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { BundleService } from './bundle.service';
+import { ProductService } from './product.service';
 import { ConfigModule } from '@nestjs/config';
 import { HttpModule } from '@nestjs/axios';
 import { GroupModule } from '../group/group.module';
@@ -8,8 +8,11 @@ import { GroupModule } from '../group/group.module';
     imports: [
         ConfigModule.forRoot(),
         HttpModule,
-    ],
-    providers: [BundleService],
-    exports: [BundleService],
+        GroupModule,
+    ],    
+    providers: [ProductService],
+    exports: [
+        ProductService,
+    ]
 })
-export class BundleModule { }
+export class ProductModule { }

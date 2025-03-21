@@ -18,6 +18,11 @@ export class MoySkladController {
         return this.moySkladService.getProductImages(id);
     }
 
+    @Get('bundle/:id/images')
+    async getBundleImages(@Param('id') id: string) {
+        return this.moySkladService.getBundleImages(id);
+    }
+
     @Get('image')
     async downloadImage(@Query('href') href: string, @Res() res: Response) {
         const imageResponse = await this.moySkladService.downloadImage(href);

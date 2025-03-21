@@ -5,6 +5,8 @@ import { catchError, firstValueFrom } from 'rxjs';
 import { AxiosError } from 'axios';
 import { SearchBaseParams } from 'src/types/search-base-params';
 import { GroupService } from './modules/group/group.service';
+import { ProductService } from './modules/product/product.service';
+import { BundleService } from './modules/bundle/bundle.service';
 
 @Injectable()
 export class MoySkladService {
@@ -15,17 +17,23 @@ export class MoySkladService {
         private readonly httpService: HttpService,
         private readonly configService: ConfigService,
         private readonly groupService: GroupService,
+        private readonly productService: ProductService,
+        private readonly bundleService: BundleService,
     ) {
         this.authToken = this.configService.get<string>('MOY_SKLAD_API_KEY');
         this.apiHost = this.configService.get<string>('MOY_SKLAD_API_HOST');
     }
 
     async getProducts(params: SearchBaseParams) {
-        return await this.groupService.getProducts(params);
+        return await this.productService.getProducts(params);
     }
 
     async getProductImages(productId: string) {
-        return await this.groupService.getProductImages(productId);
+        return await this.productService.getProductImages(productId);
+    }
+
+    async getBundleImages(bundleId: string) {
+        return await this.bundleService.getBundleImages(bundleId);
     }
 
     async downloadImage(imageDownloadHref: string) {

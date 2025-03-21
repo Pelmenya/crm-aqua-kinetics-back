@@ -6,6 +6,7 @@ import { HttpModule } from '@nestjs/axios';
 import { ServiceModule } from './modules/service/service.module';
 import { BundleModule } from './modules/bundle/bundle.module';
 import { GroupModule } from './modules/group/group.module';
+import { ProductModule } from './modules/product/product.module';
 
 @Module({
     imports: [
@@ -13,7 +14,8 @@ import { GroupModule } from './modules/group/group.module';
         HttpModule, 
         GroupModule, 
         ServiceModule, 
-        BundleModule,
+        BundleModule, 
+        ProductModule,
     ],
     providers: [
         MoySkladService,

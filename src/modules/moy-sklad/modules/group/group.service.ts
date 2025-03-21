@@ -6,6 +6,7 @@ import { SearchBaseParams } from 'src/types/search-base-params';
 import { GroupDisplaySettingRepository } from './group-display-setting.repository';
 import { ConfigService } from '@nestjs/config';
 import { TopLevelGroupDisplaySettingRepository } from './top-level-group-display-setting.repository'; // Добавьте импорт
+import { SystemBundleEnum, TSystemBundle } from '../bundle/types/t-system-bundle';
 
 @Injectable()
 export class GroupService {
@@ -160,15 +161,15 @@ export class GroupService {
         try {
             // Получаем список видимых верхнеуровневых групп
             const topLevelGroups = await this.getTopLevelGroups();
-    
+
             if (topLevelGroups.length === 0) {
                 return [];
             }
-    
+
             // Для каждой группы получаем её комплекты
             const groupsWithBundles = await Promise.all(
                 topLevelGroups.map(async (group) => {
-                    const filterQuery = `pathName=${group.parentGroupName+ '/'+ group.groupName}`; // Фильтрация по pathName
+                    const filterQuery = `pathName=${group.parentGroupName + '/' + group.groupName}`; // Фильтрация по pathName
                     const response = await firstValueFrom(
                         this.httpService.get(`${this.apiHost}/entity/bundle`, {
                             headers: {
@@ -186,17 +187,17 @@ export class GroupService {
                     );
                     return {
                         ...group, // Данные о группе
-                        bundle: response.data.rows.filter(row => row.name === 'Комплект услуг, описание группы')[0], // Комплекты, относящиеся к этой группе
+                        systemBundle: response.data.rows.filter((row: TSystemBundle) => row.name === SystemBundleEnum.NAME)[0] as TSystemBundle, // Комплекты, относящиеся к этой группе
                     };
                 })
             );
-    
+
             return groupsWithBundles;
         } catch (error) {
             console.error('Failed to get top level groups with bundles:', error);
             throw error;
         }
     }
-    
-    
+
+
 }
