@@ -17,6 +17,15 @@ export class GroupDisplaySetting {
     @Column({ default: false })
     shouldDisplay: boolean; // По умолчанию скрыты
 
+    @Column({ default: true })
+    shouldDisplayBundles: boolean; // По умолчанию отображаются
+
+    @Column({ default: true })
+    shouldDisplayServices: boolean; // По умолчанию отображаются
+
+    @Column({ default: true })
+    shouldDisplayProducts: boolean; // По умолчанию отображаются
+
     @CreateDateColumn({ type: 'timestamp' })
     createdAt: Date;
 
