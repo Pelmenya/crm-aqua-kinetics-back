@@ -7,11 +7,13 @@ import { GroupDisplaySetting } from './group-display-setting.entity';
 import { ConfigModule } from '@nestjs/config';
 import { TopLevelGroupDisplaySettingRepository } from './top-level-group-display-setting.repository';
 import { TopLevelGroupDisplaySetting } from './top-level-group-display-setting.entity';
+import { BundleModule } from '../bundle/bundle.module';
 
 @Module({
     imports: [
         ConfigModule.forRoot(),
         HttpModule,
+        BundleModule,// т.к. есть системный комплект поэтому внедряем
         TypeOrmModule.forFeature([
             GroupDisplaySetting, 
             TopLevelGroupDisplaySetting

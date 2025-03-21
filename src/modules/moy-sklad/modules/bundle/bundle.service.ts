@@ -36,4 +36,22 @@ export class BundleService {
     
             return response.data.rows;
         }
+        async getBundlesByFilter(filter: string) {
+            return await firstValueFrom(
+                this.httpService.get(`${this.apiHost}/entity/bundle`, {
+                    headers: {
+                        'Authorization': `Bearer ${this.authToken}`,
+                    },
+                    params: {
+                        filter,
+                    },
+                }).pipe(
+                    catchError((error: AxiosError) => {
+                        const message = error.message || 'An error occurred';
+                        throw new NotFoundException(message);
+                    }),
+                ),
+            );
+            
+        }
 }

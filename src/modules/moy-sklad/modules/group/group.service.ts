@@ -7,6 +7,7 @@ import { GroupDisplaySettingRepository } from './group-display-setting.repositor
 import { ConfigService } from '@nestjs/config';
 import { TopLevelGroupDisplaySettingRepository } from './top-level-group-display-setting.repository'; // Добавьте импорт
 import { SystemBundleEnum, TSystemBundle } from '../bundle/types/t-system-bundle';
+import { BundleService } from '../bundle/bundle.service';
 
 @Injectable()
 export class GroupService {
@@ -18,6 +19,7 @@ export class GroupService {
         private readonly configService: ConfigService,
         private readonly groupDisplaySettingRepository: GroupDisplaySettingRepository,
         private readonly topLevelGroupDisplaySettingRepository: TopLevelGroupDisplaySettingRepository, // Добавьте репозиторий
+        private readonly bundleService: BundleService,
     ) {
         this.authToken = this.configService.get<string>('MOY_SKLAD_API_KEY');
         this.apiHost = this.configService.get<string>('MOY_SKLAD_API_HOST');
@@ -108,26 +110,11 @@ export class GroupService {
             if (topLevelGroups.length === 0) {
                 return [];
             }
-
             // Для каждой группы получаем её комплекты
             const groupsWithBundles = await Promise.all(
                 topLevelGroups.map(async (group) => {
                     const filterQuery = `pathName=${group.parentGroupName + '/' + group.groupName}`; // Фильтрация по pathName
-                    const response = await firstValueFrom(
-                        this.httpService.get(`${this.apiHost}/entity/bundle`, {
-                            headers: {
-                                'Authorization': `Bearer ${this.authToken}`,
-                            },
-                            params: {
-                                filter: filterQuery,
-                            },
-                        }).pipe(
-                            catchError((error: AxiosError) => {
-                                const message = error.message || 'An error occurred';
-                                throw new NotFoundException(message);
-                            }),
-                        ),
-                    );
+                    const response = await this.bundleService.getBundlesByFilter(filterQuery);
                     return {
                         ...group, // Данные о группе
                         systemBundle: response.data.rows.filter((row: TSystemBundle) => row.name === SystemBundleEnum.NAME)[0] as TSystemBundle, // Комплекты, относящиеся к этой группе
