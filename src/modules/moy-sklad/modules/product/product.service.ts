@@ -186,7 +186,7 @@ export class ProductService {
                     );
                     return {
                         ...group, // Данные о группе
-                        bundles: response.data.rows, // Комплекты, относящиеся к этой группе
+                        bundle: response.data.rows.filter(row => row.name === 'Комплект услуг, описание группы')[0], // Комплекты, относящиеся к этой группе
                     };
                 })
             );
