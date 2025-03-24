@@ -9,16 +9,16 @@ export class TopLevelGroupDisplaySettingRepository {
     constructor(
         @InjectRepository(TopLevelGroupDisplaySetting)
         private readonly settingsRepository: Repository<TopLevelGroupDisplaySetting>,
-    ) {}
+    ) { }
 
     async findVisibleGroups() {
         return this.settingsRepository.find({ where: { shouldDisplay: true } });
     }
 
-    async saveGroup(groupName: string) {
+    async saveGroup(groupName: string, groupId: string) {
         const existingGroup = await this.settingsRepository.findOne({ where: { groupName } });
         if (!existingGroup) {
-            const newGroup = this.settingsRepository.create({ groupName });
+            const newGroup = this.settingsRepository.create({ groupName, groupId });
             await this.settingsRepository.save(newGroup);
         }
     }
@@ -26,4 +26,5 @@ export class TopLevelGroupDisplaySettingRepository {
     async getTopLevelGroups(): Promise<TopLevelGroupDisplaySetting[]> {
         return this.settingsRepository.find({ where: { shouldDisplay: true } });
     }
+
 }

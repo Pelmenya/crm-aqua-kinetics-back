@@ -8,6 +8,7 @@ import { ConfigService } from '@nestjs/config';
 import { TopLevelGroupDisplaySettingRepository } from './top-level-group-display-setting.repository'; // Добавьте импорт
 import { SystemBundleEnum, TSystemBundle } from '../bundle/types/t-system-bundle';
 import { BundleService } from '../bundle/bundle.service';
+import * as cron from 'node-cron';
 
 @Injectable()
 export class GroupService {
@@ -26,14 +27,18 @@ export class GroupService {
 
         // Инициализируем настройки при старте приложения
         this.initializeSettings();
+
+        // Устанавливаем cron-задачу для инициализации каждые 10 минут
+        cron.schedule('*/10 * * * *', () => {
+            this.initializeSettings();
+        });
     }
 
     private async initializeSettings() {
         try {
             await this.updateGroupDisplaySettings();
             console.log('Product display settings initialized.');
-
-            // Инициализация верхнеуровневых групп
+            //Инициализация верхнеуровневых групп
             await this.initializeTopLevelGroups();
             console.log('Top level groups initialized.');
         } catch (error) {
@@ -45,7 +50,7 @@ export class GroupService {
         const groups = await this.getGroups();
         for (const group of groups) {
             if (!group.pathName) {  // Проверяем, что группа является верхнеуровневой
-                await this.topLevelGroupDisplaySettingRepository.saveGroup(group.name);
+                await this.topLevelGroupDisplaySettingRepository.saveGroup(group.name, group.id);
             }
         }
     }
@@ -121,13 +126,11 @@ export class GroupService {
                     };
                 })
             );
-
             return groupsWithBundles;
         } catch (error) {
             console.error('Failed to get top level groups with bundles:', error);
             throw error;
         }
     }
-
 
 }

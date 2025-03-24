@@ -8,7 +8,7 @@ import { GroupDisplaySetting } from './modules/group/group-display-setting.entit
 export class MoySkladController {
     constructor(private readonly moySkladService: MoySkladService) { }
 
-    @Get('product')
+    @Get('group/:id/product')
     async getProducts(@Query() query: SearchBaseParams) {
         return this.moySkladService.getProducts(query);
     }
@@ -40,4 +40,8 @@ export class MoySkladController {
         return await this.moySkladService.getTopLevelGroups();
     }
 
+    @Get('top-level-groups-products')
+    async getTopLevelGroupsProducts(): Promise<GroupDisplaySetting[]> {
+        return await this.moySkladService.getTopLevelGroupsProducts();
+    }
 }

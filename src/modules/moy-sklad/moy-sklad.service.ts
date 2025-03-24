@@ -57,6 +57,14 @@ export class MoySkladService {
     }
 
     async getTopLevelGroups() {
-        return await this.groupService.getTopLevelGroupsWithBundles() 
+        const groupsWithBundles = await this.groupService.getTopLevelGroupsWithBundles();
+        return groupsWithBundles;
+    }
+
+    async getTopLevelGroupsProducts(): Promise<any> {
+        const parentGroupNames = await this.groupService.getTopLevelGroups();
+        // пока так вручную, при разработке кабинета админа можно настроить.
+        const products = await this.productService.getProducts({ q: parentGroupNames[0].groupName });
+        return products;
     }
 }

@@ -7,6 +7,9 @@ export class TopLevelGroupDisplaySetting {
     id: number;
 
     @Column()
+    groupId: string; // Идентификатор группы в МойСклад
+
+    @Column()
     groupName: string;
 
     @Column({ default: false })

@@ -21,16 +21,9 @@ export class ProductService {
 
     }
     async getProducts(params: SearchBaseParams) {
-        const { q, limit, offset } = params;
+        const { q, limit, offset } = params; // q = fullPathName группы
 
-        // Получаем список видимых верхнеуровневых групп
-        const topLevelGroups = await this.topLevelGroupDisplaySettingRepository.findVisibleGroups();
-
-        if (topLevelGroups.length === 0) {
-            return [];
-        }
-
-        const filterQuery = topLevelGroups.map(group => `pathName=${group.groupName}`).join(';');
+       const filterQuery = `pathName=${q}`;
 
         try {
             const response = await firstValueFrom(
@@ -39,7 +32,6 @@ export class ProductService {
                         'Authorization': `Bearer ${this.authToken}`,
                     },
                     params: {
-                        search: q,
                         limit,
                         offset,
                         filter: filterQuery,
