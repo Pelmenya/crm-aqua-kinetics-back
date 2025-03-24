@@ -1,13 +1,10 @@
 // top-level-group-display-setting.entity.ts
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, PrimaryColumn } from 'typeorm';
 
 @Entity()
 export class TopLevelGroupDisplaySetting {
-    @PrimaryGeneratedColumn()
-    id: number;
-
-    @Column()
-    groupId: string; // Идентификатор группы в МойСклад
+    @PrimaryColumn({ type: 'uuid' }) // Id как в Мой склад
+    id: string;
 
     @Column()
     groupName: string;

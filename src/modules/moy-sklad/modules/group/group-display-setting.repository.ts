@@ -15,7 +15,7 @@ export class GroupDisplaySettingRepository {
     }
 
     async findByGroupId(groupId: string) {
-        return this.settingsRepository.findOne({ where: { groupId } });
+        return this.settingsRepository.findOne({ where: { id: groupId } });
     }
 
     async updateDisplaySetting(groupId: string, parentGroupName: string | null, shouldDisplay: boolean, groupName: string | null) {
@@ -26,11 +26,15 @@ export class GroupDisplaySettingRepository {
             setting.groupName = groupName;
             await this.settingsRepository.save(setting);
         } else {
-            const newSetting = this.settingsRepository.create({ groupId, parentGroupName, shouldDisplay, groupName });
+            const newSetting = this.settingsRepository.create({ id: groupId, parentGroupName, shouldDisplay, groupName });
             await this.settingsRepository.save(newSetting);
         }
     }
 
+    async clearGroups() {
+        await this.settingsRepository.delete({});
+    }
+    
     async findVisiblePathNames() {
         const settings = await this.settingsRepository.find({ where: { shouldDisplay: true } });
         return settings.map(setting => {

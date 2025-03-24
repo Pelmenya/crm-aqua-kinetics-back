@@ -8,7 +8,6 @@ import { GroupModule } from '../group/group.module';
     imports: [
         ConfigModule.forRoot(),
         HttpModule,
-        GroupModule,
     ],    
     providers: [ProductService],
     exports: [

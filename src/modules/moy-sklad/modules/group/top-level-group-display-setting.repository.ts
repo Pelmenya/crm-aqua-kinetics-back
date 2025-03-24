@@ -11,14 +11,18 @@ export class TopLevelGroupDisplaySettingRepository {
         private readonly settingsRepository: Repository<TopLevelGroupDisplaySetting>,
     ) { }
 
-    async findVisibleGroups() {
-        return this.settingsRepository.find({ where: { shouldDisplay: true } });
+    async findVisibleGroup() {
+        return this.settingsRepository.findOne({ where: { shouldDisplay: true } });
     }
 
-    async saveGroup(groupName: string, groupId: string) {
+    async clearGroups() {
+        await this.settingsRepository.delete({});
+    }
+
+    async saveGroup(groupName: string, groupId: string, shouldDisplay: boolean) {
         const existingGroup = await this.settingsRepository.findOne({ where: { groupName } });
         if (!existingGroup) {
-            const newGroup = this.settingsRepository.create({ groupName, groupId });
+            const newGroup = this.settingsRepository.create({ groupName, id: groupId, shouldDisplay });
             await this.settingsRepository.save(newGroup);
         }
     }

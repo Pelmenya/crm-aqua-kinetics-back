@@ -14,7 +14,6 @@ export class ProductService {
     constructor(
         private readonly httpService: HttpService,
         private readonly configService: ConfigService,
-        private readonly topLevelGroupDisplaySettingRepository: TopLevelGroupDisplaySettingRepository,
     ) {
         this.authToken = this.configService.get<string>('MOY_SKLAD_API_KEY');
         this.apiHost = this.configService.get<string>('MOY_SKLAD_API_HOST');

@@ -9,6 +9,7 @@ import { TopLevelGroupDisplaySettingRepository } from './top-level-group-display
 import { SystemBundleEnum, TSystemBundle } from '../bundle/types/t-system-bundle';
 import { BundleService } from '../bundle/bundle.service';
 import * as cron from 'node-cron';
+import { GroupDisplaySetting } from './group-display-setting.entity';
 
 @Injectable()
 export class GroupService {
@@ -36,11 +37,11 @@ export class GroupService {
 
     private async initializeSettings() {
         try {
-            await this.updateGroupDisplaySettings();
-            console.log('Product display settings initialized.');
             //Инициализация верхнеуровневых групп
             await this.initializeTopLevelGroups();
             console.log('Top level groups initialized.');
+            await this.updateGroupDisplaySettings();
+            console.log('Product display settings initialized.');
         } catch (error) {
             console.error('Failed to initialize settings:', error);
         }
@@ -50,7 +51,16 @@ export class GroupService {
         const groups = await this.getGroups();
         for (const group of groups) {
             if (!group.pathName) {  // Проверяем, что группа является верхнеуровневой
-                await this.topLevelGroupDisplaySettingRepository.saveGroup(group.name, group.id);
+                const bundle = await this.bundleService.getBundlesByFilter(`pathName=${group.name}`);
+                if (
+                    bundle.data.rows
+                        ?.filter((row: TSystemBundle) => row.name === SystemBundleEnum.NAME)[0]
+                        ?.attributes
+                        ?.filter((attr: { name: string }) => attr.name === SystemBundleEnum.IS_VISIBLE_FOR_APP)) {
+                    await this.topLevelGroupDisplaySettingRepository.clearGroups();
+                    await this.topLevelGroupDisplaySettingRepository.saveGroup(group.name, group.id, true);
+                    break; // найдет первую топ-группу и сохранит только ее
+                }
             }
         }
     }
@@ -75,27 +85,30 @@ export class GroupService {
     }
 
     async updateGroupDisplaySettings() {
+        const topLevelGroup = await this.topLevelGroupDisplaySettingRepository.findVisibleGroup();
         const groups = await this.getGroups();
 
-        for (const group of groups) {
-            const existingSetting = await this.groupDisplaySettingRepository.findByGroupId(group.id);
-
-            if (!existingSetting) {
+        //фильтруем по top-level группе
+        const filterGroups = groups.filter(group => 
+            group.pathName.startsWith(`${topLevelGroup.groupName}`)
+        );
+        await this.groupDisplaySettingRepository.clearGroups();
+        for (const group of filterGroups) {
+            // есть комплект и атрибут SystemBundleEnum.IS_VISIBLE_FOR_APP value = true
+            const bundle = await this.bundleService.getBundlesByFilter(`pathName= ${group.pathName}/${group.name}`);
+            if (
+                bundle.data.rows
+                    ?.filter((row: TSystemBundle) => row.name === SystemBundleEnum.NAME)[0]
+                    ?.attributes
+                    ?.filter((attr: { name: string }) => attr.name === SystemBundleEnum.IS_VISIBLE_FOR_APP)[0].value) {
                 await this.groupDisplaySettingRepository.updateDisplaySetting(
                     group.id,
                     group.pathName || null, // Сохранение имени родительской группы
-                    false, // По умолчанию скрыты
+                    true, // По умолчанию скрыты
                     group.name || null // Сохранение имени группы
                 );
-            } else {
-                existingSetting.groupName = group.name || existingSetting.groupName;
-                await this.groupDisplaySettingRepository.updateDisplaySetting(
-                    existingSetting.groupId,
-                    existingSetting.parentGroupName,
-                    existingSetting.shouldDisplay,
-                    existingSetting.groupName
-                );
             }
+
         }
     }
 
@@ -111,7 +124,6 @@ export class GroupService {
         try {
             // Получаем список видимых верхнеуровневых групп
             const topLevelGroups = await this.getTopLevelGroups();
-
             if (topLevelGroups.length === 0) {
                 return [];
             }

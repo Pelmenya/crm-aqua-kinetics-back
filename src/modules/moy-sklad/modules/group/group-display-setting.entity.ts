@@ -1,12 +1,9 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, PrimaryColumn } from 'typeorm';
 
 @Entity()
 export class GroupDisplaySetting {
-    @PrimaryGeneratedColumn()
-    id: number;
-
-    @Column()
-    groupId: string; // Идентификатор группы в МойСклад
+    @PrimaryColumn({type: 'uuid'})
+    id: string;
 
     @Column({ nullable: true })
     parentGroupName: string | null; // Имя родительской группы, если есть
@@ -16,15 +13,6 @@ export class GroupDisplaySetting {
 
     @Column({ default: false })
     shouldDisplay: boolean; // По умолчанию скрыты
-
-    @Column({ default: true })
-    shouldDisplayBundles: boolean; // По умолчанию отображаются
-
-    @Column({ default: true })
-    shouldDisplayServices: boolean; // По умолчанию отображаются
-
-    @Column({ default: true })
-    shouldDisplayProducts: boolean; // По умолчанию отображаются
 
     @CreateDateColumn({ type: 'timestamp' })
     createdAt: Date;
