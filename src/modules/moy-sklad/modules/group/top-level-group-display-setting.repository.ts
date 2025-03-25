@@ -15,10 +15,6 @@ export class TopLevelGroupDisplaySettingRepository {
         return this.settingsRepository.findOne({ where: { shouldDisplay: true } });
     }
 
-    async clearGroups() {
-        await this.settingsRepository.delete({});
-    }
-
     async saveGroup(groupName: string, groupId: string, shouldDisplay: boolean) {
         const existingGroup = await this.settingsRepository.findOne({ where: { groupName } });
         if (!existingGroup) {
@@ -27,8 +23,7 @@ export class TopLevelGroupDisplaySettingRepository {
         }
     }
 
-    async getTopLevelGroups(): Promise<TopLevelGroupDisplaySetting[]> {
-        return this.settingsRepository.find({ where: { shouldDisplay: true } });
+    async getTopLevelGroup(): Promise<TopLevelGroupDisplaySetting> {
+        return this.settingsRepository.findOne({ where: { shouldDisplay: true } });
     }
-
 }

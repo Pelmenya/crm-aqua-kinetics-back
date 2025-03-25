@@ -2,14 +2,19 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { catchError, firstValueFrom } from 'rxjs';
 import { AxiosError } from 'axios';
-import { SearchBaseParams } from 'src/types/search-base-params';
 import { GroupDisplaySettingRepository } from './group-display-setting.repository';
 import { ConfigService } from '@nestjs/config';
 import { TopLevelGroupDisplaySettingRepository } from './top-level-group-display-setting.repository'; // Добавьте импорт
 import { SystemBundleEnum, TSystemBundle } from '../bundle/types/t-system-bundle';
 import { BundleService } from '../bundle/bundle.service';
 import * as cron from 'node-cron';
-import { GroupDisplaySetting } from './group-display-setting.entity';
+import Bottleneck from 'bottleneck';
+
+// Создаем ограничитель с параметрами
+const limiter = new Bottleneck({
+    minTime: 67, // минимальное время между запросами (примерно 3 секунды / 45 запросов)
+    maxConcurrent: 5 // максимальное количество параллельных запросов от одного пользователя
+});
 
 @Injectable()
 export class GroupService {
@@ -38,31 +43,40 @@ export class GroupService {
     private async initializeSettings() {
         try {
             //Инициализация верхнеуровневых групп
-            await this.initializeTopLevelGroups();
+            await this.updateOrCreateTopLevelGroup();
             console.log('Top level groups initialized.');
-            await this.updateGroupDisplaySettings();
+            await this.updateOrCreateGroupDisplaySettings();
             console.log('Product display settings initialized.');
         } catch (error) {
             console.error('Failed to initialize settings:', error);
         }
     }
 
-    private async initializeTopLevelGroups() {
+    private async updateOrCreateTopLevelGroup() {
         const groups = await this.getGroups();
-        for (const group of groups) {
-            if (!group.pathName) {  // Проверяем, что группа является верхнеуровневой
-                const bundle = await this.bundleService.getBundlesByFilter(`pathName=${group.name}`);
-                if (
-                    bundle.data.rows
+
+        const initializePromises = groups.map((group) => {
+            return limiter.schedule(async () => {
+                if (!group.pathName) { // Проверяем, что группа является верхнеуровневой
+                    const bundle = await this.bundleService.getBundlesByFilter(`pathName=${group.name}`);
+                    const shouldDisplayAttr = bundle.data.rows
                         ?.filter((row: TSystemBundle) => row.name === SystemBundleEnum.NAME)[0]
                         ?.attributes
-                        ?.filter((attr: { name: string }) => attr.name === SystemBundleEnum.IS_VISIBLE_FOR_APP)) {
-                    await this.topLevelGroupDisplaySettingRepository.clearGroups();
-                    await this.topLevelGroupDisplaySettingRepository.saveGroup(group.name, group.id, true);
-                    break; // найдет первую топ-группу и сохранит только ее
+                        ?.find((attr: { name: string }) => attr.name === SystemBundleEnum.IS_VISIBLE_FOR_APP);
+
+                    if (shouldDisplayAttr) {
+                        const existingGroup = await this.topLevelGroupDisplaySettingRepository.findVisibleGroup();
+
+                        if (!existingGroup || existingGroup.groupName !== group.name) {
+                            // Обновляем только если группа не существует или отличается от текущей
+                            await this.topLevelGroupDisplaySettingRepository.saveGroup(group.name, group.id, true);
+                        }
+                    }
                 }
-            }
-        }
+            });
+        });
+
+        await Promise.all(initializePromises);
     }
 
     async getGroups() {
@@ -84,39 +98,50 @@ export class GroupService {
         return response.data.rows;
     }
 
-    async updateGroupDisplaySettings() {
+    async updateOrCreateGroupDisplaySettings() {
         const topLevelGroup = await this.topLevelGroupDisplaySettingRepository.findVisibleGroup();
         const groups = await this.getGroups();
 
-        //фильтруем по top-level группе
-        const filterGroups = groups.filter(group => 
+        const filterGroups = groups.filter(group =>
             group.pathName.startsWith(`${topLevelGroup.groupName}`)
         );
-        await this.groupDisplaySettingRepository.clearGroups();
-        for (const group of filterGroups) {
-            // есть комплект и атрибут SystemBundleEnum.IS_VISIBLE_FOR_APP value = true
-            const bundle = await this.bundleService.getBundlesByFilter(`pathName= ${group.pathName}/${group.name}`);
-            if (
-                bundle.data.rows
+
+        const updatePromises = filterGroups.map((group) => {
+            return limiter.schedule(async () => {
+                const bundle = await this.bundleService.getBundlesByFilter(`pathName= ${group.pathName}/${group.name}`);
+                const shouldDisplayAttr = bundle.data.rows
                     ?.filter((row: TSystemBundle) => row.name === SystemBundleEnum.NAME)[0]
                     ?.attributes
-                    ?.filter((attr: { name: string }) => attr.name === SystemBundleEnum.IS_VISIBLE_FOR_APP)[0].value) {
-                await this.groupDisplaySettingRepository.updateDisplaySetting(
-                    group.id,
-                    group.pathName || null, // Сохранение имени родительской группы
-                    true, // По умолчанию скрыты
-                    group.name || null // Сохранение имени группы
-                );
-            }
+                    ?.find((attr: { name: string }) => attr.name === SystemBundleEnum.IS_VISIBLE_FOR_APP);
 
-        }
+                if (shouldDisplayAttr) {
+                    const existingGroupSetting = await this.groupDisplaySettingRepository.findByGroupId(group.id);
+
+                    if (existingGroupSetting) {
+                        await this.groupDisplaySettingRepository.updateDisplaySetting(
+                            group.id,
+                            group.pathName || null,
+                            shouldDisplayAttr.value,
+                            group.name || null
+                        );
+                    } else {
+                        await this.groupDisplaySettingRepository.updateDisplaySetting(
+                            group.id,
+                            group.pathName || null,
+                            shouldDisplayAttr.value,
+                            group.name || null
+                        );
+                    }
+                }
+            });
+        });
+
+        await Promise.all(updatePromises);
     }
 
     async getTopLevelGroups() {
-        const parentGroupNames = await this.topLevelGroupDisplaySettingRepository.getTopLevelGroups();
-        // пока так вручную, при разработке кабинета админа можно настроить.
-        const topLevelGroups = await this.groupDisplaySettingRepository.getTopLevelGroups(parentGroupNames[0].groupName);
-
+        const parentGroupNames = await this.topLevelGroupDisplaySettingRepository.getTopLevelGroup();
+        const topLevelGroups = await this.groupDisplaySettingRepository.getTopLevelGroups(parentGroupNames.groupName);
         return topLevelGroups;
     }
 
