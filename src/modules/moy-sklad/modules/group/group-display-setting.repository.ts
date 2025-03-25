@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { GroupDisplaySetting } from './group-display-setting.entity';
 
 @Injectable()
@@ -16,6 +16,10 @@ export class GroupDisplaySettingRepository {
 
     async findByGroupId(groupId: string) {
         return this.settingsRepository.findOne({ where: { id: groupId } });
+    }
+
+    async findManyByGroupIds(ids: string[]) {
+        return this.settingsRepository.find({ where: { id: In(ids) } });
     }
 
     async updateDisplaySetting(groupId: string, parentGroupName: string | null, shouldDisplay: boolean, groupName: string | null) {

@@ -8,13 +8,10 @@ import { TopLevelGroupDisplaySettingRepository } from './top-level-group-display
 import { SystemBundleEnum, TSystemBundle } from '../bundle/types/t-system-bundle';
 import { BundleService } from '../bundle/bundle.service';
 import * as cron from 'node-cron';
-import Bottleneck from 'bottleneck';
+import { limiter } from '../../helpers/limiter';
+import { SearchBaseParams } from 'src/types/search-base-params';
+import { GroupDisplaySetting } from './group-display-setting.entity';
 
-// Создаем ограничитель с параметрами
-const limiter = new Bottleneck({
-    minTime: 67, // минимальное время между запросами (примерно 3 секунды / 45 запросов)
-    maxConcurrent: 5 // максимальное количество параллельных запросов от одного пользователя
-});
 
 @Injectable()
 export class GroupService {
@@ -31,10 +28,7 @@ export class GroupService {
         this.authToken = this.configService.get<string>('MOY_SKLAD_API_KEY');
         this.apiHost = this.configService.get<string>('MOY_SKLAD_API_HOST');
 
-        // Инициализируем настройки при старте приложения
-        this.initializeSettings();
-
-        // Устанавливаем cron-задачу для инициализации каждые 10 минут
+        // Устанавливаем cron-задачу для инициализации каждые 10 минут, уберем в кнопку админа
         cron.schedule('*/10 * * * *', () => {
             this.initializeSettings();
         });
@@ -53,7 +47,7 @@ export class GroupService {
     }
 
     private async updateOrCreateTopLevelGroup() {
-        const groups = await this.getGroups();
+        const groups = await this.getAllGroups();
 
         const initializePromises = groups.map((group) => {
             return limiter.schedule(async () => {
@@ -79,7 +73,7 @@ export class GroupService {
         await Promise.all(initializePromises);
     }
 
-    async getGroups() {
+    async getAllGroups() {
         const response = await firstValueFrom(
             this.httpService
                 .get(`${this.apiHost}/entity/productfolder`, {
@@ -98,9 +92,42 @@ export class GroupService {
         return response.data.rows;
     }
 
+    async findGroupById(groupId: string) {
+        return await this.groupDisplaySettingRepository.findByGroupId(groupId);
+    }
+
+    async getSubGroupsByGroupId(id: string, params: SearchBaseParams) {
+        const { limit, offset } = params;
+
+        const group = await this.findGroupById(id);
+
+        const filterQuery = `pathName=${group.parentGroupName + '/' + group.groupName}`;
+
+        const response = await firstValueFrom(
+            this.httpService
+                .get(`${this.apiHost}/entity/productfolder`, {
+                    headers: {
+                        'Authorization': `Bearer ${this.authToken}`,
+                    },
+                    params: {
+                        limit,
+                        offset,
+                        filter: filterQuery,
+                    }
+                })
+                .pipe(
+                    catchError((error: AxiosError) => {
+                        const message = error.message || 'An error occurred';
+                        throw new NotFoundException(message);
+                    }),
+                ),
+        );
+        return await this.groupDisplaySettingRepository.findManyByGroupIds(response.data.rows.map(item => item.id));
+    }
+
     async updateOrCreateGroupDisplaySettings() {
         const topLevelGroup = await this.topLevelGroupDisplaySettingRepository.findVisibleGroup();
-        const groups = await this.getGroups();
+        const groups = await this.getAllGroups();
 
         const filterGroups = groups.filter(group =>
             group.pathName.startsWith(`${topLevelGroup.groupName}`)
@@ -145,10 +172,8 @@ export class GroupService {
         return topLevelGroups;
     }
 
-    async getTopLevelGroupsWithBundles() {
+    async getGroupsWithBundles(topLevelGroups: GroupDisplaySetting[]) {
         try {
-            // Получаем список видимых верхнеуровневых групп
-            const topLevelGroups = await this.getTopLevelGroups();
             if (topLevelGroups.length === 0) {
                 return [];
             }

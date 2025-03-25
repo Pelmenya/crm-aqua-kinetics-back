@@ -4,7 +4,6 @@ import { ConfigService } from '@nestjs/config';
 import { catchError, firstValueFrom } from 'rxjs';
 import { AxiosError } from 'axios';
 import { SearchBaseParams } from 'src/types/search-base-params';
-import { TopLevelGroupDisplaySettingRepository } from '../group/top-level-group-display-setting.repository';
 
 @Injectable()
 export class ProductService {
@@ -19,10 +18,10 @@ export class ProductService {
         this.apiHost = this.configService.get<string>('MOY_SKLAD_API_HOST');
 
     }
-    async getProducts(params: SearchBaseParams) {
+    async getProductsByPathName(params: SearchBaseParams) {
         const { q, limit, offset } = params; // q = fullPathName группы
 
-       const filterQuery = `pathName=${q}`;
+        const filterQuery = `pathName=${q}`;
 
         try {
             const response = await firstValueFrom(

@@ -8,9 +8,15 @@ import { GroupDisplaySetting } from './modules/group/group-display-setting.entit
 export class MoySkladController {
     constructor(private readonly moySkladService: MoySkladService) { }
 
-    @Get('group/:id/product')
-    async getProducts(@Query() query: SearchBaseParams) {
-        return this.moySkladService.getProducts(query);
+    @Get('group/:id/products')
+    async getProducts(@Param('id') id: string, @Query() query: SearchBaseParams) {
+        return this.moySkladService.getProductsByGroupId(id, query);
+    }
+
+    @Get('group/:id/groups')
+    async getGroups(@Param('id') id: string, @Query() query: SearchBaseParams) {
+        
+        return await this.moySkladService.getSubGroupsByGroupId(id, query);
     }
 
     @Get('product/:id/images')

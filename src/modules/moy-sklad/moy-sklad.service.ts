@@ -24,8 +24,15 @@ export class MoySkladService {
         this.apiHost = this.configService.get<string>('MOY_SKLAD_API_HOST');
     }
 
-    async getProducts(params: SearchBaseParams) {
-        return await this.productService.getProducts(params);
+    async getSubGroupsByGroupId(id: string, params: SearchBaseParams) {
+        const subGroups = await this.groupService.getSubGroupsByGroupId(id, params);
+        return await this.groupService.getGroupsWithBundles(subGroups);
+    }
+
+    async getProductsByGroupId(id: string, params: SearchBaseParams) {
+        const group = await this.groupService.findGroupById(id);
+        const q = group.parentGroupName + '/' + group.groupName;
+        return await this.productService.getProductsByPathName({ ...params, q });
     }
 
     async getProductImages(productId: string) {
@@ -57,14 +64,15 @@ export class MoySkladService {
     }
 
     async getTopLevelGroups() {
-        const groupsWithBundles = await this.groupService.getTopLevelGroupsWithBundles();
+        const topLevelGroups = await this.groupService.getTopLevelGroups();
+        const groupsWithBundles = await this.groupService.getGroupsWithBundles(topLevelGroups);
         return groupsWithBundles;
     }
 
     async getTopLevelGroupsProducts(): Promise<any> {
         const parentGroupNames = await this.groupService.getTopLevelGroups();
         // пока так вручную, при разработке кабинета админа можно настроить.
-        const products = await this.productService.getProducts({ q: parentGroupNames[0].groupName });
+        const products = await this.productService.getProductsByPathName({ q: parentGroupNames[0].groupName });
         return products;
     }
 }
