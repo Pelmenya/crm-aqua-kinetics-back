@@ -7,6 +7,7 @@ import { SearchBaseParams } from 'src/types/search-base-params';
 import { GroupService } from './modules/group/group.service';
 import { ProductService } from './modules/product/product.service';
 import { BundleService } from './modules/bundle/bundle.service';
+import { TProductResponse } from './modules/product/types/t-product-res';
 
 @Injectable()
 export class MoySkladService {
@@ -35,7 +36,7 @@ export class MoySkladService {
         return await this.productService.getProductsByPathName({ ...params, q });
     }
 
-    async getProduct(id: string) {
+    async getProduct(id: string): Promise<TProductResponse & { services: string[] }> {
         // Ищем товар
         const product = await this.productService.getProduct(id);
         // Ищем его группу
@@ -46,7 +47,7 @@ export class MoySkladService {
         const systemBundle = await this.groupService.getGroupBundle(group);
         //Ids Услуг
         const services = await this.bundleService.getServicesByBundleId(systemBundle.id);
-        return { product: { services, ...product } };
+        return { ...product, services };
     }
 
     async getProductImages(productId: string) {

@@ -122,7 +122,7 @@ export class GroupService {
                     }),
                 ),
         );
-        return await this.groupDisplaySettingRepository.findManyByGroupIds(response.data.rows.map(item => item.id));
+        return await this.groupDisplaySettingRepository.findManyVisibleByGroupIds(response.data.rows.map(item => item.id));
     }
 
     async updateOrCreateGroupDisplaySettings() {
