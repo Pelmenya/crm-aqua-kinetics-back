@@ -195,4 +195,16 @@ export class GroupService {
         }
     }
 
+    async getGroupBundle(group: GroupDisplaySetting) {
+        try {
+            const filterQuery = `pathName=${group.parentGroupName + '/' + group.groupName}`; // Фильтрация по pathName
+            const response = await this.bundleService.getBundlesByFilter(filterQuery);
+            const bundle: TSystemBundle = response.data.rows.filter((row: TSystemBundle) => row.name === SystemBundleEnum.NAME)[0];
+            return bundle // Комплект, относящиеся к этой группе
+        } catch (error) {
+            console.error('Failed to get top level groups with bundles:', error);
+            throw error;
+        }
+    }
+
 }

@@ -3,6 +3,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { catchError, firstValueFrom } from 'rxjs';
 import { AxiosError } from 'axios';
+import { TBundleComponentsResponse } from './types/t-bundle';
 
 @Injectable()
 export class BundleService {
@@ -53,5 +54,27 @@ export class BundleService {
             ),
         );
 
+    }
+
+    async getServicesByBundleId(bundleId: string): Promise<string[]> {
+        // Получаем компоненты
+        const response = await firstValueFrom(
+            this.httpService.get<TBundleComponentsResponse>(`${this.apiHost}/entity/bundle/${bundleId}/components`, {
+                headers: {
+                    'Authorization': `Bearer ${this.authToken}`,
+                },
+            }).pipe(
+                catchError((error: AxiosError) => {
+                    const message = error.message || 'An error occurred';
+                    throw new NotFoundException(message);
+                }),
+            ),
+        );
+
+        // Фильтруем компоненты по типу service и извлекаем их id
+        const services = response.data.rows
+            .filter(component => component.assortment.meta.type === 'service')
+            .map(component => component.id);
+        return services;
     }
 }
