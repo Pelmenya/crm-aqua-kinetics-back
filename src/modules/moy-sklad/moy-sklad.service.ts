@@ -35,6 +35,19 @@ export class MoySkladService {
         return await this.productService.getProductsByPathName({ ...params, q });
     }
 
+    async getProduct(id:string) {
+       // Ищем товар
+       const product = await this.productService.getProduct(id);
+       // Ищем его группу
+       const paths = product.productFolder.meta.href.split('/');
+       const groupId = paths[paths.length - 1];
+       const group = await this.groupService.findGroupById(groupId);
+       // Ищем системный комплект
+       const systemBundle = await this.groupService.getGroupsWithBundles([group])[0];
+       // Ищем услуги по комплекту
+       return { product: {...product, group } };
+    }
+
     async getProductImages(productId: string) {
         return await this.productService.getProductImages(productId);
     }

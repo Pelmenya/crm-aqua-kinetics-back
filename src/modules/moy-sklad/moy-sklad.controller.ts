@@ -15,13 +15,17 @@ export class MoySkladController {
 
     @Get('group/:id/groups')
     async getGroups(@Param('id') id: string, @Query() query: SearchBaseParams) {
-        
         return await this.moySkladService.getSubGroupsByGroupId(id, query);
     }
 
     @Get('product/:id/images')
     async getProductImages(@Param('id') id: string) {
         return this.moySkladService.getProductImages(id);
+    }
+
+    @Get('product/:id')
+    async getProduct(@Param('id') id: string) {
+        return this.moySkladService.getProduct(id);
     }
 
     @Get('bundle/:id/images')

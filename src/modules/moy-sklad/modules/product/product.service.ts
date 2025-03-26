@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { catchError, firstValueFrom } from 'rxjs';
 import { AxiosError } from 'axios';
 import { SearchBaseParams } from 'src/types/search-base-params';
+import { TProductResponse } from './types/t-product-res';
 
 @Injectable()
 export class ProductService {
@@ -68,4 +69,21 @@ export class ProductService {
         return response.data.rows;
     }
 
+    async getProduct(productId: string): Promise<TProductResponse> {
+        const response = await firstValueFrom(
+            this.httpService
+                .get(`${this.apiHost}/entity/product/${productId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${this.authToken}`,
+                    },
+                })
+                .pipe(
+                    catchError((error: AxiosError) => {
+                        const message = error.message || 'An error occurred';
+                        throw new NotFoundException(message);
+                    }),
+                ),
+        );
+       return response.data;
+    }
 }
