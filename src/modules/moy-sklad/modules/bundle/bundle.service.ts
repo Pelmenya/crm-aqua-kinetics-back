@@ -56,7 +56,7 @@ export class BundleService {
 
     }
 
-    async getServicesByBundleId(bundleId: string): Promise<string[]> {
+    async getServicesIdsByBundleId(bundleId: string): Promise<string[]> {
         // Получаем компоненты
         const response = await firstValueFrom(
             this.httpService.get<TBundleComponentsResponse>(`${this.apiHost}/entity/bundle/${bundleId}/components`, {

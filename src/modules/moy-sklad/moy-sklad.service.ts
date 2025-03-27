@@ -36,7 +36,7 @@ export class MoySkladService {
         return await this.productService.getProductsByPathName({ ...params, q });
     }
 
-    async getProduct(id: string): Promise<TProductResponse & { services: string[] }> {
+    async getProduct(id: string): Promise<TProductResponse & { servicesIds: string[] }> {
         // Ищем товар
         const product = await this.productService.getProduct(id);
         // Ищем его группу
@@ -46,8 +46,8 @@ export class MoySkladService {
         // Ищем системный комплект
         const systemBundle = await this.groupService.getGroupBundle(group);
         //Ids Услуг
-        const services = await this.bundleService.getServicesByBundleId(systemBundle.id);
-        return { ...product, services };
+        const servicesIds = await this.bundleService.getServicesIdsByBundleId(systemBundle.id);
+        return { ...product, servicesIds };
     }
 
     async getProductImages(productId: string) {

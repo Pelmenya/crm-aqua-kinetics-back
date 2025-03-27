@@ -27,7 +27,7 @@ export class GroupService {
     ) {
         this.authToken = this.configService.get<string>('MOY_SKLAD_API_KEY');
         this.apiHost = this.configService.get<string>('MOY_SKLAD_API_HOST');
-
+        this.initializeSettings();
         // Устанавливаем cron-задачу для инициализации каждые 10 минут, уберем в кнопку админа
         cron.schedule('*/10 * * * *', () => {
             this.initializeSettings();
