@@ -8,6 +8,7 @@ import { GroupService } from './modules/group/group.service';
 import { ProductService } from './modules/product/product.service';
 import { BundleService } from './modules/bundle/bundle.service';
 import { TProductResponse } from './modules/product/types/t-product-res';
+import { ServiceService } from './modules/service/service.service';
 
 @Injectable()
 export class MoySkladService {
@@ -20,6 +21,7 @@ export class MoySkladService {
         private readonly groupService: GroupService,
         private readonly productService: ProductService,
         private readonly bundleService: BundleService,
+        private readonly serviceService: ServiceService,
     ) {
         this.authToken = this.configService.get<string>('MOY_SKLAD_API_KEY');
         this.apiHost = this.configService.get<string>('MOY_SKLAD_API_HOST');
@@ -48,6 +50,11 @@ export class MoySkladService {
         //Ids Услуг
         const servicesIds = await this.bundleService.getServicesIdsByBundleId(systemBundle.id);
         return { ...product, servicesIds };
+    }
+
+    async getService(id: string) {
+        const service = await this.serviceService.getService(id);
+        return service;
     }
 
     async getProductImages(productId: string) {

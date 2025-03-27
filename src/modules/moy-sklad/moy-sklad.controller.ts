@@ -28,6 +28,11 @@ export class MoySkladController {
         return this.moySkladService.getProduct(id);
     }
 
+    @Get('service/:id')
+    async getService(@Param('id') id: string) {
+        return this.moySkladService.getService(id);
+    }
+
     @Get('bundle/:id/images')
     async getBundleImages(@Param('id') id: string) {
         return this.moySkladService.getBundleImages(id);

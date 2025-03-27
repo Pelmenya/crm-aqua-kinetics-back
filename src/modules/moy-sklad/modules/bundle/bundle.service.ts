@@ -74,7 +74,7 @@ export class BundleService {
         // Фильтруем компоненты по типу service и извлекаем их id
         const services = response.data.rows
             .filter(component => component.assortment.meta.type === 'service')
-            .map(component => component.id);
+            .map(component => component.assortment.meta.href.split('/')[component.assortment.meta.href.split('/').length - 1]);
         return services;
     }
 }

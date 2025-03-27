@@ -13,9 +13,9 @@ import { ProductModule } from './modules/product/product.module';
         ConfigModule.forRoot(),
         HttpModule, 
         GroupModule, 
-        ServiceModule, 
         BundleModule, 
         ProductModule,
+        ServiceModule, 
     ],
     providers: [
         MoySkladService,
