@@ -18,6 +18,10 @@ export class GroupDisplaySettingRepository {
         return this.settingsRepository.findOne({ where: { id: groupId } });
     }
 
+    async findByNameAndParentName(groupName: string, parentGroupName:string){
+        return this.settingsRepository.findOne({ where: { groupName, parentGroupName } });
+    }
+
     async findManyVisibleByGroupIds(ids: string[]) {
         return this.settingsRepository.find({ where: { id: In(ids), shouldDisplay: true } });
     }

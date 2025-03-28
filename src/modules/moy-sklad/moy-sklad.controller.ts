@@ -18,6 +18,12 @@ export class MoySkladController {
         return await this.moySkladService.getSubGroupsByGroupId(id, query);
     }
 
+    @Get('group/:id/path')
+    async getGroupPath(@Param('id') id: string) {
+        console.log(id)
+        return await this.moySkladService.getGroupPath(id);
+    }
+
     @Get('product/:id/images')
     async getProductImages(@Param('id') id: string) {
         return this.moySkladService.getProductImages(id);

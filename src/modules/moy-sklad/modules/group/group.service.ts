@@ -96,6 +96,25 @@ export class GroupService {
         return await this.groupDisplaySettingRepository.findByGroupId(groupId);
     }
 
+    async getGroupPath(groupId: string)
+        : Promise<GroupDisplaySetting[]> {
+        const path: GroupDisplaySetting[] = [];
+        let currentGroup = await this.findGroupById(groupId);
+
+        
+        while (currentGroup) {
+            path.unshift(currentGroup);
+            if (currentGroup.parentGroupName) {
+                const parentGroupName = currentGroup.parentGroupName.split('/').splice(0,currentGroup.parentGroupName.split('/').length -1).join('/');
+                const groupName = currentGroup.parentGroupName.split('/').pop();
+                currentGroup = await this.groupDisplaySettingRepository.findByNameAndParentName(groupName, parentGroupName);
+            } else {
+                currentGroup = null;
+            }
+        }
+        return path;
+    }
+
     async getSubGroupsByGroupId(id: string, params: SearchBaseParams) {
         const { limit, offset } = params;
 

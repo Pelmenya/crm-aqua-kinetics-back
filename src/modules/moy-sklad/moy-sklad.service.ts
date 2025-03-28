@@ -32,6 +32,10 @@ export class MoySkladService {
         return await this.groupService.getGroupsWithBundles(subGroups);
     }
 
+    async getGroupPath (id: string){
+        return await this.groupService.getGroupPath(id);
+    }
+
     async getProductsByGroupId(id: string, params: SearchBaseParams) {
         const group = await this.groupService.findGroupById(id);
         const q = group.parentGroupName + '/' + group.groupName;
