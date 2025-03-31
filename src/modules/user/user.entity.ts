@@ -1,6 +1,7 @@
 import { Entity, Column, PrimaryColumn, CreateDateColumn, UpdateDateColumn, OneToMany, OneToOne, JoinColumn } from 'typeorm';
 import { RealEstate } from '../client/modules/real-estate/real-estate.entity';
 import { AccountService } from '../service/modules/account-service/account-service.entity';
+import { Cart } from '../cart/cart.entity';
 
 export enum UserRole {
     ADMIN = 'admin',
@@ -52,6 +53,10 @@ export class User {
     @OneToOne(() => AccountService , accountService => accountService.user, { nullable: true })
     @JoinColumn() // Указывает колонку для соединения
     accountService: AccountService;
+
+    @OneToOne(() => Cart , cart => cart.user, { nullable: true })
+    @JoinColumn() // Указывает колонку для соединения
+    cart: Cart;
 
     @CreateDateColumn({ type: 'timestamp' })
     created_at: Date;

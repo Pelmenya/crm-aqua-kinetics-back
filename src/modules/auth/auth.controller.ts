@@ -13,13 +13,12 @@ export class AuthController {
         private readonly authService: AuthService,
         private readonly userRepository: UserRepository,
     ) { }
+
     @Post('init')
     async authorize(@Req() req: TRequestWithUser) {
-
         const initData = await this.authService.validateInitData(req);
         return initData;
     }
-
 
     @Put('register')
     async register(@Req() req: TRequestWithUser, @Body() body: Partial<UserCreateDto>) {

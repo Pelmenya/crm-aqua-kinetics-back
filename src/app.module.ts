@@ -11,6 +11,7 @@ import { ProxyModule } from './modules/proxy/proxy.module';
 import { ServiceModule } from './modules/service/service.module';
 import { ClientModule } from './modules/client/client.module';
 import { MoySkladModule } from './modules/moy-sklad/moy-sklad.module';
+import { CartModule } from './modules/cart/cart.module';
 
 @Module({
     imports: [
@@ -24,6 +25,7 @@ import { MoySkladModule } from './modules/moy-sklad/moy-sklad.module';
         ServiceModule,
         ClientModule,
         MoySkladModule,
+        CartModule,
     ],
     controllers: [AppController],
     providers: [AppService],

@@ -6,6 +6,7 @@ import { User } from 'src/modules/user/user.entity';
 import { CalendarWorkDay } from 'src/modules/service/modules/calendar-work-day/calendar-work-day.entity';
 import { GroupDisplaySetting } from 'src/modules/moy-sklad/modules/group/group-display-setting.entity';
 import { TopLevelGroupDisplaySetting } from 'src/modules/moy-sklad/modules/group/top-level-group-display-setting.entity';
+import { Cart } from 'src/modules/cart/cart.entity';
 
 export const getPostgresConfig = async (
     configService: ConfigService,
@@ -24,6 +25,7 @@ export const getPostgresConfig = async (
             CalendarWorkDay,
             GroupDisplaySetting,
             TopLevelGroupDisplaySetting,
+            Cart,
         ],
         synchronize: true,
     };

@@ -1,18 +1,19 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, PrimaryColumn } from 'typeorm';
+import { Entity, Column, CreateDateColumn, UpdateDateColumn, PrimaryColumn, Index } from 'typeorm';
 
 @Entity()
+@Index(['groupName', 'parentGroupName'], { unique: true })
 export class GroupDisplaySetting {
-    @PrimaryColumn({type: 'uuid'})
+    @PrimaryColumn({ type: 'uuid' })
     id: string;
 
     @Column({ nullable: true })
-    parentGroupName: string | null; // Имя родительской группы, если есть
+    parentGroupName: string | null;
 
     @Column({ nullable: true })
-    groupName: string | null; // Имя группы в МойСклад
+    groupName: string | null;
 
     @Column({ default: false })
-    shouldDisplay: boolean; // По умолчанию скрыты
+    shouldDisplay: boolean;
 
     @CreateDateColumn({ type: 'timestamp' })
     createdAt: Date;
