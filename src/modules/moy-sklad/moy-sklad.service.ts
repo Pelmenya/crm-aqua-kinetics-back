@@ -42,9 +42,10 @@ export class MoySkladService {
         return await this.productService.getProductsByPathName({ ...params, q });
     }
 
-    async getProduct(id: string): Promise<TProductResponse & { servicesIds: string[] }> {
+    async getProduct(productId: string): Promise<Partial<TProductResponse> & { servicesIds: string[] }> {
         // Ищем товар
-        const product = await this.productService.getProduct(id);
+        const product = await this.productService.getProduct(productId);
+        const { id, name, description } = product;
         // Ищем его группу
         const paths = product.productFolder.meta.href.split('/');
         const groupId = paths[paths.length - 1];
@@ -53,7 +54,7 @@ export class MoySkladService {
         const systemBundle = await this.groupService.getGroupBundle(group);
         //Ids Услуг
         const servicesIds = await this.bundleService.getServicesIdsByBundleId(systemBundle.id);
-        return { ...product, servicesIds };
+        return { id, name, description, servicesIds };
     }
 
     async getService(id: string) {

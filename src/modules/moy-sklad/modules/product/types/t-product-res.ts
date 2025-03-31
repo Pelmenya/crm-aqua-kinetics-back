@@ -58,6 +58,7 @@ type TMeta = {
   export type TProductResponse = {
     meta: TMeta;
     id: string;
+    description: string;
     accountId: string;
     owner: TOwner;
     shared: boolean;
