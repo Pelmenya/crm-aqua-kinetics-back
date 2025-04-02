@@ -30,7 +30,7 @@ export class AccountService {
     @Column('json', { nullable: true })
     workDays: TWorkDay[];
 
-    @Column({ default: 2 })
+    @Column({ nullable: true })
     calendarMonths: number;
 
     @OneToMany(() => CalendarWorkDay, calendarWorkDay => calendarWorkDay.accountService)
