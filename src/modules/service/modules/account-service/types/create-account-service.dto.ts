@@ -31,10 +31,6 @@ export class CreateAccountServiceDto {
     coordinates?: { type: string; coordinates: [number, number] };
 
     @IsOptional()
-    @IsNumber()
-    radiusKm?: number;
-
-    @IsOptional()
     @IsString()
     carNumber?: string;
 

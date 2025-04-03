@@ -15,9 +15,6 @@ export class AccountService {
     coordinates: { type: 'Point', coordinates: [number, number] };
 
     @Column({ nullable: true })
-    radiusKm: number;
-
-    @Column({ nullable: true })
     carNumber: string;
 
     @Column({ nullable: true })
