@@ -33,6 +33,9 @@ export class ServiceService {
                     }),
                 ),
         );
-        return response.data;
+
+        const { id, name, description, attributes } = response.data
+        const rateOfHours = attributes.find((attr: {name: string}) => attr.name === 'Нормо час').value;
+        return { id, name, description, rateOfHours };
     }
 }
